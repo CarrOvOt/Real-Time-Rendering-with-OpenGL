@@ -136,13 +136,19 @@
     <ClInclude Include="External\GLAD\include\KHR\khrplatform.h" />
     <ClInclude Include="External\GLFW\include\glfw3.h" />
     <ClInclude Include="External\GLFW\include\glfw3native.h" />
+    <ClInclude Include="shader.h" />
+    <ClInclude Include="simpleMesh.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\GLAD\src\glad.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="shader.cpp" />
+    <ClCompile Include="simpleMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="External\GLFW\lib\glfw3.dll" />
+    <None Include="Shaders\fshader.fs" />
+    <None Include="Shaders\vshader.vs" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\GLFW\lib\glfw3.lib" />

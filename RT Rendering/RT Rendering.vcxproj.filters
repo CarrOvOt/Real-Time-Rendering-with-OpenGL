@@ -27,6 +27,12 @@
     <ClInclude Include="External\GLFW\include\glfw3native.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="shader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="simpleMesh.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\GLAD\src\glad.c">
@@ -35,9 +41,17 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="shader.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="simpleMesh.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="External\GLFW\lib\glfw3.dll" />
+    <None Include="Shaders\vshader.vs" />
+    <None Include="Shaders\fshader.fs" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\GLFW\lib\glfw3.lib" />
