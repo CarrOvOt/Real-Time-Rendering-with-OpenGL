@@ -21,16 +21,43 @@
     <ClInclude Include="External\GLAD\include\KHR\khrplatform.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="External\GLFW\include\glfw3.h">
+    <ClInclude Include="External\GLFW\include\GLFW\glfw3.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="External\GLFW\include\glfw3native.h">
+    <ClInclude Include="External\GLFW\include\GLFW\glfw3native.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="shader.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="simpleMesh.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGUI\imconfig.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGUI\imgui.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGUI\imgui_impl_glfw.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGUI\imgui_impl_opengl3.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGUI\imgui_impl_opengl3_loader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGUI\imgui_internal.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGUI\imstb_rectpack.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGUI\imstb_textedit.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGUI\imstb_truetype.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -45,6 +72,27 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="simpleMesh.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGUI\imgui.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGUI\imgui_demo.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGUI\imgui_draw.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGUI\imgui_impl_glfw.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGUI\imgui_impl_opengl3.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGUI\imgui_tables.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGUI\imgui_widgets.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

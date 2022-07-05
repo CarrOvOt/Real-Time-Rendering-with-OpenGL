@@ -134,13 +134,29 @@
   <ItemGroup>
     <ClInclude Include="External\GLAD\include\glad\glad.h" />
     <ClInclude Include="External\GLAD\include\KHR\khrplatform.h" />
-    <ClInclude Include="External\GLFW\include\glfw3.h" />
-    <ClInclude Include="External\GLFW\include\glfw3native.h" />
+    <ClInclude Include="External\GLFW\include\GLFW\glfw3.h" />
+    <ClInclude Include="External\GLFW\include\GLFW\glfw3native.h" />
+    <ClInclude Include="External\ImGUI\imconfig.h" />
+    <ClInclude Include="External\ImGUI\imgui.h" />
+    <ClInclude Include="External\ImGUI\imgui_impl_glfw.h" />
+    <ClInclude Include="External\ImGUI\imgui_impl_opengl3.h" />
+    <ClInclude Include="External\ImGUI\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="External\ImGUI\imgui_internal.h" />
+    <ClInclude Include="External\ImGUI\imstb_rectpack.h" />
+    <ClInclude Include="External\ImGUI\imstb_textedit.h" />
+    <ClInclude Include="External\ImGUI\imstb_truetype.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="simpleMesh.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\GLAD\src\glad.c" />
+    <ClCompile Include="External\ImGUI\imgui.cpp" />
+    <ClCompile Include="External\ImGUI\imgui_demo.cpp" />
+    <ClCompile Include="External\ImGUI\imgui_draw.cpp" />
+    <ClCompile Include="External\ImGUI\imgui_impl_glfw.cpp" />
+    <ClCompile Include="External\ImGUI\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="External\ImGUI\imgui_tables.cpp" />
+    <ClCompile Include="External\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="simpleMesh.cpp" />
