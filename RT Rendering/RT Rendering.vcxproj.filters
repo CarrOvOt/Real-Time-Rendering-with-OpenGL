@@ -906,6 +906,9 @@
     <ClInclude Include="External\include\glm\vector_relational.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="gui.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\GLAD\src\glad.c">
@@ -942,6 +945,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="External\include\glm\detail\glm.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="gui.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

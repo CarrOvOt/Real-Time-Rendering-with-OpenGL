@@ -52,8 +52,6 @@ Mesh：加载顶点数据，生成VAO，VBO，EBO，以及主循环中使用的D
 
 <img title="" src="MDImages/2022-07-05-21-55-00-image.png" alt="" width="321">
 
-
-
 ### ver0.4
 
 **加入坐标在各个空间上的变换，这样就可以看到立体的mesh了**
@@ -62,13 +60,9 @@ Mesh：加载顶点数据，生成VAO，VBO，EBO，以及主循环中使用的D
 
 因为现在mesh顶点的坐标会根据各空间的变换矩阵变化，所以在shader中（vertex shader）我们需要将变换矩阵告诉shader，这里主要使用shader中的uniform（变量），所以我们要完善一下Shader类并修改shader的源代码。
 
-
-
 （这个版本简单设置了一下包含目录，将不包含.lib和.dll的第三方库（glm，ImGUI）都移至`External/include`中了）（这样可用尖括号include了，这样三方库中的一些include语句就不会报错了）
 
 ![ver0.4.gif](MDImages/dcb0a14cdc22238aa2dc3ca362e99480e09a0738.gif)
-
-
 
 参考资料：
 
@@ -76,8 +70,12 @@ Mesh：加载顶点数据，生成VAO，VBO，EBO，以及主循环中使用的D
 
 [着色器 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/01%20Getting%20started/05%20Shaders/)
 
-
-
 ### ver0.5
 
-TODO：现在我们可以修改的参数有点多了，把ImGUI抽象为一个类，并提供相应的方法实现参数的修改，让main函数看起来干净一点
+**把ImGUI的初始化放在另外一个文件中，让main函数看起来干净一点**
+
+将一个结构体传给GUI类让其自动生成相应的能修改结构体内容的ImGUI窗口需要用到**反射**，现在并不会，就先放一下吧，所以现在ImGUI窗口构建的代码仍然写在main.cpp里。
+
+然后加入了输入处理（esc退出）和窗口大小调整的适配。
+
+参考资料：[从零开始手敲次世代游戏引擎（八十四） - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/517828683)
