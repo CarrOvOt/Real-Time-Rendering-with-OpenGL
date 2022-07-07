@@ -79,3 +79,29 @@ Mesh：加载顶点数据，生成VAO，VBO，EBO，以及主循环中使用的D
 然后加入了输入处理（esc退出）和窗口大小调整的适配。
 
 参考资料：[从零开始手敲次世代游戏引擎（八十四） - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/517828683)
+
+### ver0.6
+
+**给立方体加上贴图**
+
+首先我们需要用[stb_image.h]([stb/stb_image.h at master · nothings/stb (github.com)](https://github.com/nothings/stb/blob/master/stb_image.h))这个库来加载图片文件（当然其他的库也行），把这个.h文件加入我们的项目即可。
+
+<img title="" src="MDImages/3e234bb222b6876e349cdeb4cc5b9a0cec59a64a.png" alt="" width="281">
+
+贴图（纹理/texture）一般是和mesh绑定的，所以我们在simpleMesh类中添加相关代码。
+
+我们将一个2D的图片映射到一个3D的mesh上，需要告诉每个顶点对应的贴图上的坐标（这里需要拆分顶点：[一些说明](./documents/texture.md)），所以我们还需要修改顶点属性并告诉OpenGL（用glVertexAttribPointer）如何解析数据。
+
+拆分顶点且坐标设置无误后效果应该是这样的
+
+![ver0.6-1.gif](MDImages/1ad34ad076f87ab741cda0759179de1ff02adde9.gif)
+
+
+
+可以看到有点奇怪，首先我们看到的是cube的里侧，其次有时候后面的面反而把前面的面遮住了。其实这是同一个原因导致的：没有进行[深度测试](https://learnopengl-cn.github.io/01%20Getting%20started/08%20Coordinate%20Systems/#3d)，三角面片会根据渲染顺序显示，而不是远近顺序。使用Z缓冲（Z-buffer）进行深度测试即可
+
+![](MDImages/2022-07-07-15-01-36-image.png)
+
+
+
+参考资料：[纹理 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/01%20Getting%20started/06%20Textures/)

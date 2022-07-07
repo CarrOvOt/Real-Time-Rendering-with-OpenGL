@@ -909,6 +909,9 @@
     <ClInclude Include="gui.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="External\include\stb_image.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\GLAD\src\glad.c">
@@ -948,6 +951,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="gui.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="stb_image_wrap.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

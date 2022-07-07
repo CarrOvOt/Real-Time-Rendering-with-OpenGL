@@ -13,7 +13,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-
 // our code
 #include "shader.h"
 #include "simpleMesh.h"
@@ -31,6 +30,7 @@ static unsigned int SCR_HEIGHT = 720;
 // options & settings in GUI
 bool use_wireframe_mode = false;
 
+float rot_y = 0.0f;
 float rot_z = 0.0f;
 float scale_xyz = 1.0f;
 float trans_x = 0.0f;
@@ -54,6 +54,7 @@ void GUITick() {
 
         ImGui::Checkbox("Wireframe Mode", &use_wireframe_mode);
 
+        ImGui::SliderFloat("rot_y", &rot_y, -180.0f, 180.0);
         ImGui::SliderFloat("rot_z", &rot_z, -180.0f, 180.0);
         ImGui::SliderFloat("scale_xyz", &scale_xyz, 0.1f, 5.0f);
         ImGui::SliderFloat("trans_x", &trans_x, -10.0f, 10.0f);
@@ -118,6 +119,7 @@ int main(){
     // ImGUI
     GUI::ImGUIInit(window);
 
+
    
     // mesh & shader
     SimpleMesh _mesh = SimpleMesh(SHAPE::CUBE);
@@ -130,6 +132,9 @@ int main(){
     glm::mat4 proj_sp_original = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
 
+    // GL settings
+    glEnable(GL_DEPTH_TEST);
+
     // rendering loop
     while (!glfwWindowShouldClose(window)){
 
@@ -137,6 +142,7 @@ int main(){
 
         glm::mat4 model_sp = glm::scale(glm::mat4(1.0f), glm::vec3(scale_xyz, scale_xyz, scale_xyz)) * model_sp_original;
         model_sp = glm::rotate(glm::mat4(1.0f), glm::radians(rot_z), glm::vec3(0.0, 0.0, 1.0)) * model_sp;
+        model_sp = glm::rotate(glm::mat4(1.0f), glm::radians(rot_y), glm::vec3(0.0, 1.0, 0.0)) * model_sp;
         model_sp = glm::translate(glm::mat4(1.0f), glm::vec3(trans_x, 0.0f, 0.0f))* model_sp;
 
         glm::mat4 view_sp = glm::translate(view_sp_original, glm::vec3(0.0f, 0.0f, -3.0f));
@@ -145,7 +151,7 @@ int main(){
         
 
         glClearColor(0.2f, 0.3f, 0.2f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
 
 
         if (use_wireframe_mode) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

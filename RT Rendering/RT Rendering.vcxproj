@@ -427,6 +427,7 @@
     <ClInclude Include="External\include\ImGUI\imstb_rectpack.h" />
     <ClInclude Include="External\include\ImGUI\imstb_textedit.h" />
     <ClInclude Include="External\include\ImGUI\imstb_truetype.h" />
+    <ClInclude Include="External\include\stb_image.h" />
     <ClInclude Include="gui.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="simpleMesh.h" />
@@ -441,6 +442,7 @@
     <ClCompile Include="External\include\ImGUI\imgui_impl_opengl3.cpp" />
     <ClCompile Include="External\include\ImGUI\imgui_tables.cpp" />
     <ClCompile Include="External\include\ImGUI\imgui_widgets.cpp" />
+    <ClCompile Include="stb_image_wrap.cpp" />
     <ClCompile Include="gui.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="shader.cpp" />
