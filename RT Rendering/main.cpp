@@ -15,7 +15,7 @@
 
 // our code
 #include "shader.h"
-#include "simpleMesh.h"
+#include "model.h"
 #include "gui.h"
 
 // others
@@ -122,7 +122,8 @@ int main(){
 
    
     // mesh & shader
-    SimpleMesh _mesh = SimpleMesh(SHAPE::CUBE);
+    Model _model = Model();
+    
     Shader _shader = Shader("Shaders/vshader.vs", "Shaders/fshader.fs");
 
 
@@ -163,7 +164,7 @@ int main(){
         _shader.setMat4("view_sp", view_sp);
         _shader.setMat4("proj_sp", proj_sp);
 
-        _mesh.Draw();
+        _model.Draw(_shader);
 
 
         GUITick();

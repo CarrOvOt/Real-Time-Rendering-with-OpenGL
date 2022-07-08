@@ -8,35 +8,24 @@
 #include <vector>
 #include <iostream>
 
+#include "mesh.h"
+
 using namespace std;
-
-
-struct Vertex {
-	// position
-	float Position[3];
-	float TexCoord[2];
-};
-
-
 
 enum SHAPE {
 	CUBE
 };
 
-class SimpleMesh {
+
+
+class SimpleMesh: public Mesh{
 
 public:
-	SimpleMesh(SHAPE shape);
-	void Draw();
+	SimpleMesh(SHAPE shape=CUBE);
 
+	//void Draw(Shader& shader);
 
 private:
-	unsigned int VAO, VBO, EBO;
-	vector<Vertex> vertices;
-	vector<unsigned int> indices;
-	unsigned int texture;
-
-	void setupMesh();
 
 
 };

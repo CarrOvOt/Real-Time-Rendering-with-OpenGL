@@ -50,82 +50,105 @@ SimpleMesh::SimpleMesh(SHAPE shape){
     if (shape == CUBE) {
         for (int i = 0; i < 14; ++i) {
             Vertex v;
-            v.Position[0] = CubeVert[i * 5];
-            v.Position[1] = CubeVert[i * 5 + 1];
-            v.Position[2] = CubeVert[i * 5 + 2];
-            v.TexCoord[0] = CubeVert[i * 5 + 3];
-            v.TexCoord[1] = CubeVert[i * 5 + 4];
+            v.Position = glm::vec3(CubeVert[i * 5], CubeVert[i * 5 + 1], CubeVert[i * 5 + 2]);
+            v.TexCoord = glm::vec2(CubeVert[i * 5 + 3], CubeVert[i * 5 + 4]);
             vertices.emplace_back(v);
         }
         for (int i = 0; i < 36; ++i) {
             indices.emplace_back(CubeIndic[i]);
         }
 
+        
+
+        // generate and bind texture
+        unsigned int texture_id;
+        stbi_set_flip_vertically_on_load(true); // flip y-axis
+        int width, height, nrChannels;
+        unsigned char* data = stbi_load("./Resource/dice.png", &width, &height, &nrChannels, 0);
+        if (!data) std::cout << "Failed to load texture" << std::endl;
+
+        glGenTextures(1, &texture_id);
+        glBindTexture(GL_TEXTURE_2D, texture_id);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        // free data after bind texture
+        stbi_image_free(data);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        Texture texture;
+        texture.id = texture_id;
+        texture.type = TEXTURE_TYPE::DIFFUSE;
+
+        textures.emplace_back(texture);
+
+
     }
     setupMesh();
 }
 
-void SimpleMesh::Draw(){
+//void SimpleMesh::Draw(Shader& shader){
+//
+//    glBindVertexArray(VAO);
+//    glBindTexture(GL_TEXTURE_2D, texture);
+//
+//    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+//    glBindVertexArray(0);
+//}
 
-    glBindVertexArray(VAO);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-}
-
-void SimpleMesh::setupMesh(){
-
-    //init VBO,VAO,EBO
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(indices), &indices[0], GL_STATIC_DRAW);
-
-    //explain data buffer
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); 
-
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0);
-
-
-    // texture
-    stbi_set_flip_vertically_on_load(true); // flip y-axis
-    int width, height, nrChannels;
-    unsigned char* data = stbi_load("./Resource/dice.png", &width, &height, &nrChannels, 0);
-    if(!data) std::cout<< "Failed to load texture" << std::endl;
-
-    //unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    // free data after bind texture
-    stbi_image_free(data);
-
-
-}
-
+//void SimpleMesh::setupMesh(){
+//
+//    //init VBO,VAO,EBO
+//    glGenVertexArrays(1, &VAO);
+//    glGenBuffers(1, &VBO);
+//    glGenBuffers(1, &EBO);
+//    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+//    glBindVertexArray(VAO);
+//
+//    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+//    glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
+//
+//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+//    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(indices), &indices[0], GL_STATIC_DRAW);
+//
+//    //explain data buffer
+//    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+//    glEnableVertexAttribArray(0);
+//
+//    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+//    glEnableVertexAttribArray(1);
+//
+//    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+//    glBindBuffer(GL_ARRAY_BUFFER, 0);
+//
+//    // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
+//    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); 
+//
+//    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+//    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+//    glBindVertexArray(0);
+//
+//
+//    // texture
+//    stbi_set_flip_vertically_on_load(true); // flip y-axis
+//    int width, height, nrChannels;
+//    unsigned char* data = stbi_load("./Resource/dice.png", &width, &height, &nrChannels, 0);
+//    if(!data) std::cout<< "Failed to load texture" << std::endl;
+//
+//    //unsigned int texture;
+//    glGenTextures(1, &texture);
+//    glBindTexture(GL_TEXTURE_2D, texture);
+//
+//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+//    glGenerateMipmap(GL_TEXTURE_2D);
+//
+//    // free data after bind texture
+//    stbi_image_free(data);
+//
+//
+//}
+//
 
 
 
