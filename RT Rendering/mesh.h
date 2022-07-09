@@ -12,6 +12,7 @@
 #include <iostream>
 
 #include "shader.h"
+#include "camera.h"
 
 using namespace std;
 
@@ -34,17 +35,24 @@ struct Texture {
 class Mesh {
 
 public:
+
+	glm::mat4 Tranform = glm::mat4(1.0f);
+
 	Mesh();
 	Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures);
 
-	void Draw(Shader& shader);
+	void virtual Draw(Camera& camera, glm::mat4 parent_trans); // Draw with default shader, and now ONLY SimpleMesh use this.
+
+	void Draw(Shader& shader, Camera& camera, glm::mat4 parent_trans);
 
 
 protected:
 	unsigned int VAO, VBO, EBO;
-	vector<Vertex> vertices;
-	vector<unsigned int> indices;
-	vector<Texture> textures;
+	vector<Vertex> Vertices;
+	vector<unsigned int> Indices;
+	vector<Texture> Textures;
+
+	Shader DefaultShader;
 
 	void setupMesh();
 

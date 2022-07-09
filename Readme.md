@@ -158,6 +158,36 @@ QE：上下移动（世界空间）
 
 ### ver0.8
 
-TODO：**加入基础光照：冯氏光照模型（Phong Lighting Model）**
+**~~加入基础光照：冯氏光照模型（Phong Lighting Model）~~   下个版本再加**
+
+本来想这个版本加入基础光照的，发现调整的东西有点多，就下版本再加了。
+
+- 让SimpleMesh拥有一个DefaultShader成员
+  
+  首先我们想让SimpleMesh能生成一个单一颜色的立方体，用来表示一个光源（这里只是单纯的视觉上的表示，实际并不发光），渲染这个立方体只需要一个简单的shader，所以我们让SimpleMesh拥有一个DefaultShader成员，如果调用Draw方法时没有提供shader，就让Mesh使用默认的shader。
+
+- 让Mesh和Model的Draw方法接受一个Camera类型的参数（引用传递）
+  
+  无论是我们提供的shader还是默认的shader，他们都需要设置camera的观察矩阵和投影矩阵，所以我们就干脆让Draw方法接受一个Camera类型的参数，方便坐标转换。
+
+- 让Model和Mesh各拥有一个transform矩阵作为成员变量
+  
+  这个矩阵表示model在整个世界空间的位置和变换，以及mesh相对model的位置和变换。结合传入的camera，几个变换矩阵都可以在Mesh.Draw()中进行设置了。
+
+- Model中的 vector\<Mesh\> 改为 vector\<Mesh*\>
+  
+  这是因为我们将Mesh中无shader传入的Draw方法设置成了虚函数（我们希望一般的mesh能够指定shader进行渲染，他们没有默认的shader），并希望SimpleMesh能够调用自己实现的Draw方法。这里涉及到一些动态联编的知识。（参考c++ primer plus 13.4.2）
+
+最后加入了一个单项选择的ImGUI组件，后面对比光照效果会用到。
+
+![](MDImages/2022-07-10-01-57-46-image.png)
+
+
+
+### ver0.9
+
+**TODO：加入基础光照：冯氏光照模型（Phong Lighting Model）**
+
+
 
 参考资料：[基础光照 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/02%20Lighting/02%20Basic%20Lighting/#_7)

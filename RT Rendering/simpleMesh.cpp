@@ -46,46 +46,79 @@ static unsigned int CubeIndic[] = {
 
 
 
-SimpleMesh::SimpleMesh(SHAPE shape){
+SimpleMesh::SimpleMesh(){
+    
+    for (int i = 0; i < 14; ++i) {
+        Vertex v;
+        v.Position = glm::vec3(CubeVert[i * 5], CubeVert[i * 5 + 1], CubeVert[i * 5 + 2]);
+        v.TexCoord = glm::vec2(CubeVert[i * 5 + 3], CubeVert[i * 5 + 4]);
+        Vertices.emplace_back(v);
+    }
+    for (int i = 0; i < 36; ++i) {
+        Indices.emplace_back(CubeIndic[i]);
+    }
+
+        
+
+    // generate and bind texture
+    unsigned int texture_id;
+    stbi_set_flip_vertically_on_load(true); // flip y-axis
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load("./Resource/dice.png", &width, &height, &nrChannels, 0);
+    if (!data) std::cout << "Failed to load texture" << std::endl;
+
+    glGenTextures(1, &texture_id);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    // free data after bind texture
+    stbi_image_free(data);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    Texture texture;
+    texture.id = texture_id;
+    texture.type = TEXTURE_TYPE::DIFFUSE;
+
+    Textures.emplace_back(texture);
+
+    
+    setupMesh();
+}
+
+SimpleMesh::SimpleMesh(SHAPE shape, glm::vec3 color): Color(color) {
+
     if (shape == CUBE) {
         for (int i = 0; i < 14; ++i) {
             Vertex v;
             v.Position = glm::vec3(CubeVert[i * 5], CubeVert[i * 5 + 1], CubeVert[i * 5 + 2]);
             v.TexCoord = glm::vec2(CubeVert[i * 5 + 3], CubeVert[i * 5 + 4]);
-            vertices.emplace_back(v);
+            Vertices.emplace_back(v);
         }
         for (int i = 0; i < 36; ++i) {
-            indices.emplace_back(CubeIndic[i]);
+            Indices.emplace_back(CubeIndic[i]);
         }
-
-        
-
-        // generate and bind texture
-        unsigned int texture_id;
-        stbi_set_flip_vertically_on_load(true); // flip y-axis
-        int width, height, nrChannels;
-        unsigned char* data = stbi_load("./Resource/dice.png", &width, &height, &nrChannels, 0);
-        if (!data) std::cout << "Failed to load texture" << std::endl;
-
-        glGenTextures(1, &texture_id);
-        glBindTexture(GL_TEXTURE_2D, texture_id);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        // free data after bind texture
-        stbi_image_free(data);
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        Texture texture;
-        texture.id = texture_id;
-        texture.type = TEXTURE_TYPE::DIFFUSE;
-
-        textures.emplace_back(texture);
-
 
     }
     setupMesh();
+
+    DefaultShader = Shader("Shaders/pure.vs", "Shaders/pure.fs");
+
+}
+
+void SimpleMesh::Draw(Camera& camera, glm::mat4 parent_trans){
+    DefaultShader.use();
+    DefaultShader.setVec3("pure_color", Color);
+
+    DefaultShader.setMat4("model_sp", parent_trans * Tranform);
+    DefaultShader.setMat4("view_sp", camera.GetViewMatrix());
+    DefaultShader.setMat4("proj_sp", camera.GetProjMatrix());
+
+
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(Indices.size()), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 }
 
 

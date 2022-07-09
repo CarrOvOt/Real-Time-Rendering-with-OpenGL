@@ -4,28 +4,40 @@ Mesh::Mesh(){
 }
 
 Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures){
-    this->vertices = vertices;
-    this->indices = indices;
-    this->textures = textures;
+    this->Vertices = vertices;
+    this->Indices = indices;
+    this->Textures = textures;
 }
-void Mesh::Draw(Shader& shader){
+
+void Mesh::Draw(Camera& camera, glm::mat4 parent_trans){
+    std::cout << "Please provide a shader for noraml mesh rendering" << std::endl;
+}
+
+
+void Mesh::Draw(Shader& shader, Camera& camera, glm::mat4 parent_trans){
+
+    shader.use();
+
+    shader.setMat4("model_sp", parent_trans*Tranform);
+    shader.setMat4("view_sp", camera.GetViewMatrix());
+    shader.setMat4("proj_sp", camera.GetProjMatrix());
 
 	// bind textures
 	unsigned int diffuseNr = 1;
 
-	for (unsigned int i = 0; i < textures.size(); ++i) {
+	for (unsigned int i = 0; i < Textures.size(); ++i) {
 		glActiveTexture(GL_TEXTURE0 + i);
 		string name;
-		if (textures[i].type == DIFFUSE) {
+		if (Textures[i].type == DIFFUSE) {
 			name = "texture_diffuse" + std::to_string(diffuseNr++);
 		}
 		shader.setInt(name.c_str(), i);
-		glBindTexture(GL_TEXTURE_2D, textures[i].id);
+		glBindTexture(GL_TEXTURE_2D, Textures[i].id);
 	}
 
 
 	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(indices.size()), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(Indices.size()), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -42,10 +54,10 @@ void Mesh::setupMesh(){
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, Vertices.size() * sizeof(Vertices), &Vertices[0], GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(indices), &indices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(Indices), &Indices[0], GL_STATIC_DRAW);
 
     //explain data buffer
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);

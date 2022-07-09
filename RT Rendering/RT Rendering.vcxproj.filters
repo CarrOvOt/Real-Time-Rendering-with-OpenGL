@@ -1387,6 +1387,8 @@
     <None Include="External\include\glm\gtx\wrap.inl">
       <Filter>头文件</Filter>
     </None>
+    <None Include="Shaders\pure.fs" />
+    <None Include="Shaders\pure.vs" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\GLFW\lib\glfw3.lib" />

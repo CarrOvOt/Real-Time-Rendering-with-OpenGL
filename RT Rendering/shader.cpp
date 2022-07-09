@@ -1,5 +1,9 @@
 #include "shader.h"
 
+Shader::Shader(){
+    ID = -1;
+}
+
 Shader::Shader(const char* vertexPath, const char* fragmentPath){
 
     // load code from file
@@ -61,6 +65,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath){
 }
 
 void Shader::use(){
+    if(ID==-1) std::cout << "ERROR::SHADER::NO DEFAULT SHADER" << std::endl;
 	glUseProgram(ID);
 }
 

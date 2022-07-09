@@ -21,6 +21,7 @@
 
 // others
 #include <iostream>
+#include <string>
 
 
 // settings
@@ -40,15 +41,19 @@ bool firstMouse = true;
 Camera mainCamera= Camera(SCR_HEIGHT, SCR_WIDTH);
 
 // show mouse to use gui and hide mouse to use camera
-bool showMouse = false;
+bool showMouse = true;
 
 // options & settings in GUI
 bool use_wireframe_mode = false;
+float background_color[3] = { 0.2f, 0.3f, 0.2f };
 
 float rot_y = 0.0f;
 float rot_z = 0.0f;
 float scale_xyz = 1.0f;
 float trans_x = 0.0f;
+
+int lighting_mode = 0;
+
 
 
 // rendering gui window
@@ -63,32 +68,42 @@ void GUITick() {
         static float f = 0.0f;
         static int counter = 0;
 
-        ImGui::Begin("Hello, ImGUI!");              // Create a window called "Hello, world!" and append into it.
+        ImGui::Begin("Setting");
 
-        ImGui::Text("Some settings");               // Display some text (you can use a format strings too)
+        if (ImGui::CollapsingHeader("Global Setting")) {
 
-        ImGui::Checkbox("Wireframe Mode", &use_wireframe_mode);
+            ImGui::ColorEdit3("background color", (float*)&background_color); // Edit 3 floats representing a color
+            ImGui::Checkbox("Wireframe Mode", &use_wireframe_mode);
+        }
 
-        ImGui::SliderFloat("rot_y", &rot_y, -180.0f, 180.0);
-        ImGui::SliderFloat("rot_z", &rot_z, -180.0f, 180.0);
-        ImGui::SliderFloat("scale_xyz", &scale_xyz, 0.1f, 5.0f);
-        ImGui::SliderFloat("trans_x", &trans_x, -10.0f, 10.0f);
+        if (ImGui::CollapsingHeader("Model Setting")) {
 
-        ////ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+            ImGui::SliderFloat("rot_y", &rot_y, -180.0f, 180.0);
+            ImGui::SliderFloat("rot_z", &rot_z, -180.0f, 180.0);
+            ImGui::SliderFloat("scale_xyz", &scale_xyz, 0.1f, 5.0f);
+            ImGui::SliderFloat("trans_x", &trans_x, -10.0f, 10.0f);
+        }
+
+        if (ImGui::CollapsingHeader("Lighting Mode")) {
+
+            ImGui::RadioButton("Ambient", &lighting_mode, 1); ImGui::SameLine();
+            ImGui::RadioButton("Diffuse", &lighting_mode, 2); ImGui::SameLine();
+            ImGui::RadioButton("Specular", &lighting_mode, 3);
+            ImGui::RadioButton("ALL", &lighting_mode, 0); 
+        }
+        
 
         //if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
         //    counter++;
-        //ImGui::SameLine();
-        //ImGui::Text("counter = %d", counter);
 
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
         ImGui::End();
     }
+
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 }
-
 
 // process manual operations
 void processInput(GLFWwindow* window){
@@ -166,7 +181,7 @@ int main(){
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetKeyCallback(window, key_callback);
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, showMouse ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
 
     // initialize GLAD *AFTER* creating a GLFWindow
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
@@ -180,13 +195,9 @@ int main(){
    
     // mesh & shader & camera
     Model _model = Model();
+    Model _light = Model(SHAPE::CUBE, glm::vec3(1.0f, 1.0f, 1.0f));
     Shader _shader = Shader("Shaders/vshader.vs", "Shaders/fshader.fs");
 
-
-    // coordinate transformation
-    glm::mat4 model_sp_original = glm::mat4(1.0f);
-    glm::mat4 view_sp_original = glm::mat4(1.0f);
-    glm::mat4 proj_sp_original = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
 
     // GL settings
@@ -202,30 +213,26 @@ int main(){
 
         processInput(window);
 
-        glm::mat4 model_sp = glm::scale(glm::mat4(1.0f), glm::vec3(scale_xyz, scale_xyz, scale_xyz)) * model_sp_original;
+        glm::mat4 model_sp = glm::scale(glm::mat4(1.0f), glm::vec3(scale_xyz, scale_xyz, scale_xyz));
         model_sp = glm::rotate(glm::mat4(1.0f), glm::radians(rot_z), glm::vec3(0.0, 0.0, 1.0)) * model_sp;
         model_sp = glm::rotate(glm::mat4(1.0f), glm::radians(rot_y), glm::vec3(0.0, 1.0, 0.0)) * model_sp;
         model_sp = glm::translate(glm::mat4(1.0f), glm::vec3(trans_x, 0.0f, 0.0f))* model_sp;
+        _model.tranform = model_sp;
 
-        glm::mat4 view_sp = glm::translate(view_sp_original, glm::vec3(0.0f, 0.0f, -3.0f));
+        _light.tranform= glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f)), glm::vec3(5.0f, 3.0f, 0.0f));
 
-        glm::mat4 proj_sp = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         
 
-        glClearColor(0.2f, 0.3f, 0.2f, 1.0f);
+        glClearColor(background_color[0], background_color[1], background_color[2], 1.0f);
         glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
 
 
         if (use_wireframe_mode) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-        //draw our mesh
-        _shader.use();
-        _shader.setMat4("model_sp", model_sp);
-        _shader.setMat4("view_sp", mainCamera.GetViewMatrix());
-        _shader.setMat4("proj_sp", mainCamera.GetProjMatrix());
 
-        _model.Draw(_shader);
+        _model.Draw(_shader,mainCamera);
+        _light.Draw(mainCamera);
 
 
         GUITick();
