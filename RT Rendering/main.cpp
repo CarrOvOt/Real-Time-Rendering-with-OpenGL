@@ -17,6 +17,7 @@
 #include "shader.h"
 #include "model.h"
 #include "gui.h"
+#include "camera.h"
 
 // others
 #include <iostream>
@@ -26,6 +27,20 @@
 static unsigned int SCR_WIDTH = 1280;
 static unsigned int SCR_HEIGHT = 720;
 
+// timing
+float deltaTime = 0.0f;	// time between current frame and last frame
+float lastFrame = 0.0f;
+
+// mouse pos in last frame
+float lastMouseX = SCR_WIDTH / 2.0;
+float lastMouseY = SCR_HEIGHT / 2.0;
+bool firstMouse = true;
+
+// main camera
+Camera mainCamera= Camera(SCR_HEIGHT, SCR_WIDTH);
+
+// show mouse to use gui and hide mouse to use camera
+bool showMouse = false;
 
 // options & settings in GUI
 bool use_wireframe_mode = false;
@@ -75,9 +90,17 @@ void GUITick() {
 }
 
 
+// process manual operations
 void processInput(GLFWwindow* window){
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) mainCamera.Move(CAMERAMOVE::FORWARD,deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) mainCamera.Move(CAMERAMOVE::LEFT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) mainCamera.Move(CAMERAMOVE::BACKWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) mainCamera.Move(CAMERAMOVE::RIGHT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) mainCamera.Move(CAMERAMOVE::WDUP, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) mainCamera.Move(CAMERAMOVE::WDDOWN, deltaTime);
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height){
@@ -86,9 +109,39 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height){
     SCR_WIDTH = width;
     SCR_HEIGHT = height;
     glViewport(0, 0, width, height);
+
+    mainCamera.Height = SCR_HEIGHT;
+    mainCamera.Width = SCR_WIDTH;
 }
 
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn) {
+    float xpos = (float)xposIn;
+    float ypos = (float)yposIn;
 
+    if (firstMouse) {
+        lastMouseX = xpos;
+        lastMouseY = ypos;
+        firstMouse = false;
+    }
+
+    if(!showMouse) mainCamera.Roate(xpos - lastMouseX, ypos - lastMouseY);
+    lastMouseX = xpos;
+    lastMouseY = ypos;
+
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+    mainCamera.ScaleFOV((float)yoffset);
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
+        showMouse=!showMouse;
+        glfwSetInputMode(window, GLFW_CURSOR, showMouse?GLFW_CURSOR_NORMAL:GLFW_CURSOR_DISABLED);
+        firstMouse = true;
+    }
+        
+}
 
 int main(){
 
@@ -96,6 +149,7 @@ int main(){
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    //glfwWindowHint(GLFW_RESIZABLE, false);// fix window size
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 
@@ -108,7 +162,11 @@ int main(){
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+    glfwSetKeyCallback(window, key_callback);
 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // initialize GLAD *AFTER* creating a GLFWindow
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
@@ -119,11 +177,9 @@ int main(){
     // ImGUI
     GUI::ImGUIInit(window);
 
-
    
-    // mesh & shader
+    // mesh & shader & camera
     Model _model = Model();
-    
     Shader _shader = Shader("Shaders/vshader.vs", "Shaders/fshader.fs");
 
 
@@ -138,6 +194,11 @@ int main(){
 
     // rendering loop
     while (!glfwWindowShouldClose(window)){
+
+        // timing
+        float currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
 
         processInput(window);
 
@@ -161,8 +222,8 @@ int main(){
         //draw our mesh
         _shader.use();
         _shader.setMat4("model_sp", model_sp);
-        _shader.setMat4("view_sp", view_sp);
-        _shader.setMat4("proj_sp", proj_sp);
+        _shader.setMat4("view_sp", mainCamera.GetViewMatrix());
+        _shader.setMat4("proj_sp", mainCamera.GetProjMatrix());
 
         _model.Draw(_shader);
 

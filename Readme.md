@@ -112,10 +112,52 @@ mesh类和之前的simpleMesh类相比，Draw（）需要一个shader类型的�
 
 之前的simpleMesh作为Mesh的派生类，作为Model的默认构造的结果。
 
-
-
 参考资料：
 
 [模型 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/03%20Model%20Loading/03%20Model/)
 
 [游戏资源中常见的贴图类型 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/260973533)
+
+### ver0.7
+
+**创建一个FPS风格摄像机系统**
+
+FPS风格摄像机使用欧拉角即可，暂时不需要四元数。
+
+使用WASD移动摄像机位置，鼠标调整摄像机方向，滚轮调整摄像机视野大小。
+
+场景和渲染的一些参数我们都用GUI去调整，所以对我们Input的处理仅限于调整摄像机，暂时就不单独抽象成一个类了。
+
+为了正常使用FPS摄像机和GUI调整参数，我们用数字键1切换鼠标的作用。（暂时不会控制ImGUI的输入管理，所以键位设置只能避开ImGUI的快捷键）
+
+
+
+目前的功能：
+
+WASD：前后左右移动
+
+QE：上下移动（世界空间）
+
+鼠标移动：调整方向
+
+鼠标滚轮：缩放视野大小（FOV）
+
+数字键1：切换鼠标移动的生效状态
+
+
+
+参考资料：
+
+[摄像机 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/01%20Getting%20started/09%20Camera/)
+
+关于四元数：
+
+[OpenGL_3_3_Tutorial_Translation/Tutorial 17 Rotations.md at master · cybercser/OpenGL_3_3_Tutorial_Translation (github.com)](https://github.com/cybercser/OpenGL_3_3_Tutorial_Translation/blob/master/Tutorial%2017%20Rotations.md)
+
+[Visualizing quaternions, an explorable video series (eater.net)](https://eater.net/quaternions)
+
+### ver0.8
+
+TODO：**加入基础光照：冯氏光照模型（Phong Lighting Model）**
+
+参考资料：[基础光照 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/02%20Lighting/02%20Basic%20Lighting/#_7)

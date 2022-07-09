@@ -13,5 +13,5 @@ public:
 
 private:
 	vector<Mesh> meshes;
-	vector<Texture> textures_loaded;
+	vector<Texture> texturesLoaded;
 };

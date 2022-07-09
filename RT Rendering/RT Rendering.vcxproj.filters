@@ -918,6 +918,9 @@
     <ClInclude Include="mesh.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\GLAD\src\glad.c">
@@ -966,6 +969,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="mesh.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
