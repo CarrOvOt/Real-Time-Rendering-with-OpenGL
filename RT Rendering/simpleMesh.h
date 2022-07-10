@@ -21,13 +21,18 @@ enum SHAPE {
 class SimpleMesh: public Mesh{
 
 public:
+
 	SimpleMesh();
 	SimpleMesh(SHAPE shape, glm::vec3 color);
 
 	void Draw(Camera& camera, glm::mat4 parent_trans) override;
+	void SetColor(glm::vec3 color);
 
 private:
+
 	glm::vec3 Color = glm::vec3(0.5f, 0.5f, 0.5f);
+
+	
 		
 };
 

@@ -977,8 +977,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="External\GLFW\lib\glfw3.dll" />
-    <None Include="Shaders\vshader.vs" />
-    <None Include="Shaders\fshader.fs" />
+    <None Include="Shaders\Phong.vs" />
+    <None Include="Shaders\Phong.fs" />
     <None Include="External\include\glm\detail\func_common.inl">
       <Filter>头文件</Filter>
     </None>

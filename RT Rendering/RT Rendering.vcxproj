@@ -592,10 +592,10 @@
     <None Include="External\include\glm\gtx\vector_angle.inl" />
     <None Include="External\include\glm\gtx\vector_query.inl" />
     <None Include="External\include\glm\gtx\wrap.inl" />
-    <None Include="Shaders\fshader.fs" />
+    <None Include="Shaders\Phong.fs" />
     <None Include="Shaders\pure.fs" />
     <None Include="Shaders\pure.vs" />
-    <None Include="Shaders\vshader.vs" />
+    <None Include="Shaders\Phong.vs" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\GLFW\lib\glfw3.lib" />

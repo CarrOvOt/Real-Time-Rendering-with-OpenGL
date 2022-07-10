@@ -14,33 +14,59 @@
 
 // 8 vertices of a cube
 static float CubeVert[] = {
-    // position                 // texture coordinate
-    -0.5f,  -0.5f,  0.5f,       0.25f,   0.75f,                 // 0
-    0.5f,   -0.5f,  0.5f,       0.5f,  0.75f,                   // 1
-    0.5f,   -0.5f,  -0.5f,      0.5f,  0.5f,                    // 2
-    -0.5f,  -0.5f,  -0.5f,      0.25f,   0.5f,                  // 3
-    -0.5f,  0.5f,   0.5f,       0.25f,   1.0f,                  // 4
-    0.5f,   0.5f,   0.5f,       0.5f,  1.0f,                    // 5
-    0.5f,   0.5f,   -0.5f,      0.5f,  0.25f,                   // 6
-    -0.5f,  0.5f,   -0.5f,      0.25f,   0.25f,                 // 7
+    // position                 // normal               // texture coordinate  
 
-    -0.5f,  0.5f,   0.5f,       0.0f,  0.75f,                   //4-1   8
-    -0.5f,  0.5f,   0.5f,       0.25f,   0.0f,                  //4-2   9
-    0.5f,   0.5f,   0.5f,       0.75f,   0.75f,                 // 5-1  10
-    0.5f,   0.5f,   0.5f,       0.5f,  0.0f,                    // 5-2  11
+    -0.5f,  -0.5f,  0.5f,       0.0f,0.0f,1.0f,         0.25f,  0.75f,  // 0
+    0.5f,   -0.5f,  0.5f,       0.0f,0.0f,1.0f,         0.5f,   0.75f,  // 1
+    -0.5f,  0.5f,   0.5f,       0.0f,0.0f,1.0f,         0.25f,  1.0f,   // 4
+    0.5f,   -0.5f,  0.5f,       0.0f,0.0f,1.0f,         0.5f,   0.75f,  // 1
+    0.5f,   0.5f,   0.5f,       0.0f,0.0f,1.0f,         0.5f,   1.0f,   // 5
+    -0.5f,  0.5f,   0.5f,       0.0f,0.0f,1.0f,         0.25f,  1.0f,   // 4
 
-    0.5f,   0.5f,   -0.5f,      0.75f,   0.5f,                  // 6-1  12
-    -0.5f,  0.5f,   -0.5f,      0.0f,  0.5f,                    // 7-1  13
+    0.5f,   -0.5f,  0.5f,       1.0f,0.0f,0.0f,         0.5f,   0.75f,  // 1
+    0.5f,   -0.5f,  -0.5f,      1.0f,0.0f,0.0f,         0.5f,   0.5f,   // 2
+    0.5f,   0.5f,   0.5f,       1.0f,0.0f,0.0f,         0.75f,  0.75f,  // 5-1
+    0.5f,   -0.5f,  -0.5f,      1.0f,0.0f,0.0f,         0.5f,   0.5f,   // 2
+    0.5f,   0.5f,   -0.5f,      1.0f,0.0f,0.0f,         0.75f,  0.5f,   // 6-1 
+    0.5f,   0.5f,   0.5f,       1.0f,0.0f,0.0f,         0.75f,  0.75f,  // 5-1 
+
+    0.5f,   -0.5f,  -0.5f,      0.0f,0.0f,-1.0f,        0.5f,   0.5f,   // 2
+    -0.5f,  -0.5f,  -0.5f,      0.0f,0.0f,-1.0f,        0.25f,  0.5f,   // 3
+    0.5f,   0.5f,   -0.5f,      0.0f,0.0f,-1.0f,        0.5f,   0.25f,  // 6
+    -0.5f,  -0.5f,  -0.5f,      0.0f,0.0f,-1.0f,        0.25f,  0.5f,   // 3
+    -0.5f,  0.5f,   -0.5f,      0.0f,0.0f,-1.0f,        0.25f,  0.25f,  // 7
+    0.5f,   0.5f,   -0.5f,      0.0f,0.0f,-1.0f,        0.5f,   0.25f,  // 6
+
+    -0.5f,  -0.5f,  -0.5f,      -1.0f,0.0f,0.0f,         0.25f,  0.5f,   // 3
+    -0.5f,  -0.5f,  0.5f,       -1.0f,0.0f,0.0f,         0.25f,  0.75f,  // 0
+    -0.5f,  0.5f,   -0.5f,      -1.0f,0.0f,0.0f,         0.0f,   0.5f,   // 7-1 
+    -0.5f,  -0.5f,  0.5f,       -1.0f,0.0f,0.0f,         0.25f,  0.75f,  // 0
+    -0.5f,  0.5f,   0.5f,       -1.0f,0.0f,0.0f,         0.0f,   0.75f,  // 4-1
+    -0.5f,  0.5f,   -0.5f,      -1.0f,0.0f,0.0f,         0.0f,   0.5f,   // 7-1 
+
+    -0.5f,  0.5f,   0.5f,       0.0f,1.0f,0.0f,         0.25f,  0.0f,   // 4-2 
+    0.5f,   0.5f,   0.5f,       0.0f,1.0f,0.0f,         0.5f,   0.0f,   // 5-2 
+    -0.5f,  0.5f,   -0.5f,      0.0f,1.0f,0.0f,         0.25f,  0.25f,  // 7
+    0.5f,   0.5f,   0.5f,       0.0f,1.0f,0.0f,         0.5f,   0.0f,   // 5-2 
+    0.5f,   0.5f,   -0.5f,      0.0f,1.0f,0.0f,         0.5f,   0.25f,  // 6
+    -0.5f,  0.5f,   -0.5f,      0.0f,1.0f,0.0f,         0.25f,  0.25f,  // 7
+
+    -0.5f,  -0.5f,  0.5f,       0.0f,-1.0f,0.0f,        0.25f,  0.75f,  // 0
+    -0.5f,  -0.5f,  -0.5f,      0.0f,-1.0f,0.0f,        0.25f,  0.5f,   // 3
+    0.5f,   -0.5f,  0.5f,       0.0f,-1.0f,0.0f,        0.5f,   0.75f,  // 1
+    -0.5f,  -0.5f,  -0.5f,      0.0f,-1.0f,0.0f,        0.25f,  0.5f,   // 3
+    0.5f,   -0.5f,  -0.5f,      0.0f,-1.0f,0.0f,        0.5f,   0.5f,   // 2
+    0.5f,   -0.5f,  0.5f,       0.0f,-1.0f,0.0f,        0.5f,   0.75f,  // 1
 };
 
 // 12 triangles of 6 face
 static unsigned int CubeIndic[] = {
-    0,1,4,  1,5,4,
-    1,2,10,  2,12,10,
-    2,3,6,  3,7,6,
-    3,0,13,  0,8,13,
-    9,11,7,  11,6,7,
-    2,3,1,  3,0,1,
+    0,1,2,  3,4,5,
+    6,7,8,  9,10,11,
+    12,13,14,  15,16,17,
+    18,19,20,  21,22,23,
+    24,25,26,  27,28,29,
+    30,31,32,  33,34,35,
 };
 
 
@@ -48,10 +74,11 @@ static unsigned int CubeIndic[] = {
 
 SimpleMesh::SimpleMesh(){
     
-    for (int i = 0; i < 14; ++i) {
+    for (int i = 0; i < 36; ++i) {
         Vertex v;
-        v.Position = glm::vec3(CubeVert[i * 5], CubeVert[i * 5 + 1], CubeVert[i * 5 + 2]);
-        v.TexCoord = glm::vec2(CubeVert[i * 5 + 3], CubeVert[i * 5 + 4]);
+        v.Position = glm::vec3(CubeVert[i * 8], CubeVert[i * 8 + 1], CubeVert[i * 8 + 2]);
+        v.Normal = glm::vec3(CubeVert[i * 8+3], CubeVert[i * 8 + 4], CubeVert[i * 8 + 5]);
+        v.TexCoord = glm::vec2(CubeVert[i * 8 + 6], CubeVert[i * 8 + 7]);
         Vertices.emplace_back(v);
     }
     for (int i = 0; i < 36; ++i) {
@@ -90,10 +117,11 @@ SimpleMesh::SimpleMesh(){
 SimpleMesh::SimpleMesh(SHAPE shape, glm::vec3 color): Color(color) {
 
     if (shape == CUBE) {
-        for (int i = 0; i < 14; ++i) {
+        for (int i = 0; i < 36; ++i) {
             Vertex v;
-            v.Position = glm::vec3(CubeVert[i * 5], CubeVert[i * 5 + 1], CubeVert[i * 5 + 2]);
-            v.TexCoord = glm::vec2(CubeVert[i * 5 + 3], CubeVert[i * 5 + 4]);
+            v.Position = glm::vec3(CubeVert[i * 8], CubeVert[i * 8 + 1], CubeVert[i * 8 + 2]);
+            v.Normal = glm::vec3(CubeVert[i * 8 + 3], CubeVert[i * 8 + 4], CubeVert[i * 8 + 5]);
+            v.TexCoord = glm::vec2(CubeVert[i * 8 + 6], CubeVert[i * 8 + 7]);
             Vertices.emplace_back(v);
         }
         for (int i = 0; i < 36; ++i) {
@@ -119,6 +147,10 @@ void SimpleMesh::Draw(Camera& camera, glm::mat4 parent_trans){
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(Indices.size()), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+}
+
+void SimpleMesh::SetColor(glm::vec3 color){
+    Color = color;
 }
 
 

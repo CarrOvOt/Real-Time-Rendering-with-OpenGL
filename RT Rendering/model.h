@@ -11,6 +11,9 @@ public:
 
 	glm::mat4 tranform=glm::mat4(1.0f);
 
+	vector<Mesh*> meshes;
+	vector<Texture> texturesLoaded;
+
 	Model();
 	Model(SHAPE shape,glm::vec3 color);
 
@@ -18,6 +21,7 @@ public:
 	void Draw(Shader& shader, Camera& camera);
 
 private:
-	vector<Mesh*> meshes;
-	vector<Texture> texturesLoaded;
+
+
+
 };

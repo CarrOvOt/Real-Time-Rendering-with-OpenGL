@@ -45,14 +45,26 @@ bool showMouse = true;
 
 // options & settings in GUI
 bool use_wireframe_mode = false;
-float background_color[3] = { 0.2f, 0.3f, 0.2f };
+
+glm::vec3 background_color = glm::vec3(0.2f, 0.2f, 0.2f );
 
 float rot_y = 0.0f;
 float rot_z = 0.0f;
 float scale_xyz = 1.0f;
 float trans_x = 0.0f;
+glm::vec3 model_color = glm::vec3(0.2f, 0.5f, 0.5f);
+int model_shininess = 32;
 
-int lighting_mode = 0;
+int lighting_mode = 1;
+
+glm::vec3 light_pos = glm::vec3(0.8f, 0.4f, 1.5f);
+glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
+
+glm::vec3 ambient_color = glm::vec3(1.0f, 1.0f, 1.0f);
+float ambient_strength = 0.1f;
+
+float specular_strength = 0.5f;
+
 
 
 
@@ -75,6 +87,7 @@ void GUITick() {
             ImGui::ColorEdit3("background color", (float*)&background_color); // Edit 3 floats representing a color
             ImGui::Checkbox("Wireframe Mode", &use_wireframe_mode);
         }
+        ImGui::Spacing();
 
         if (ImGui::CollapsingHeader("Model Setting")) {
 
@@ -82,19 +95,26 @@ void GUITick() {
             ImGui::SliderFloat("rot_z", &rot_z, -180.0f, 180.0);
             ImGui::SliderFloat("scale_xyz", &scale_xyz, 0.1f, 5.0f);
             ImGui::SliderFloat("trans_x", &trans_x, -10.0f, 10.0f);
+            ImGui::ColorEdit3("model color", (float*)&model_color);
+            ImGui::SliderInt("model shininess", &model_shininess,1,256);
         }
+        ImGui::Spacing();
 
-        if (ImGui::CollapsingHeader("Lighting Mode")) {
+        ImGui::RadioButton("Ambient", &lighting_mode, 1<<1); ImGui::SameLine();
+        ImGui::RadioButton("Diffuse", &lighting_mode, 1<<2); ImGui::SameLine();
+        ImGui::RadioButton("Specular", &lighting_mode, 1<<3); ImGui::SameLine();
+        ImGui::RadioButton("ALL", &lighting_mode, 1); 
+        ImGui::Spacing();
 
-            ImGui::RadioButton("Ambient", &lighting_mode, 1); ImGui::SameLine();
-            ImGui::RadioButton("Diffuse", &lighting_mode, 2); ImGui::SameLine();
-            ImGui::RadioButton("Specular", &lighting_mode, 3);
-            ImGui::RadioButton("ALL", &lighting_mode, 0); 
-        }
-        
+        ImGui::DragFloat3("light pos_xyz", (float*)&light_pos, 0.05f, -10.0f, -10.0f);
+        ImGui::ColorEdit3("light color", (float*)&light_color);
+        ImGui::Spacing();
 
-        //if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-        //    counter++;
+        ImGui::ColorEdit3("ambient color", (float*)&ambient_color);
+        ImGui::SliderFloat("ambient strength", &ambient_strength, 0.0f, 1.0f);
+        ImGui::SliderFloat("specular strength", &specular_strength, 0.0f, 1.0f);
+
+        ImGui::Spacing();
 
         ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
         ImGui::End();
@@ -194,9 +214,9 @@ int main(){
 
    
     // mesh & shader & camera
-    Model _model = Model();
+    Model _model = Model(SHAPE::CUBE, glm::vec3(1.0f, 1.0f, 1.0f));
     Model _light = Model(SHAPE::CUBE, glm::vec3(1.0f, 1.0f, 1.0f));
-    Shader _shader = Shader("Shaders/vshader.vs", "Shaders/fshader.fs");
+    Shader phong_shader = Shader("Shaders/Phong.vs", "Shaders/Phong.fs");
 
 
 
@@ -219,19 +239,31 @@ int main(){
         model_sp = glm::translate(glm::mat4(1.0f), glm::vec3(trans_x, 0.0f, 0.0f))* model_sp;
         _model.tranform = model_sp;
 
-        _light.tranform= glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(0.2f, 0.2f, 0.2f)), glm::vec3(5.0f, 3.0f, 0.0f));
-
+        _light.tranform= glm::translate(glm::mat4(1.0f), light_pos) * glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 0.1f, 0.1f));
+        SimpleMesh* m = (SimpleMesh*)_light.meshes[0];
+        m->SetColor(light_color);
         
 
-        glClearColor(background_color[0], background_color[1], background_color[2], 1.0f);
+        glClearColor(background_color.x, background_color.y, background_color.z, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
-
 
         if (use_wireframe_mode) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+        phong_shader.use();
+        phong_shader.setInt("lighting_mode", lighting_mode);
+        phong_shader.setVec3("model_color", model_color);
+        phong_shader.setVec3("ambient_color", ambient_color);
+        phong_shader.setFloat("ambient_strength", ambient_strength);
+        phong_shader.setVec3("light_pos", light_pos);
+        phong_shader.setVec3("light_color", light_color);
+        phong_shader.setVec3("camera_pos", mainCamera.Position);
+        phong_shader.setFloat("specular_strength", specular_strength);
+        phong_shader.setInt("shininess", model_shininess);
 
-        _model.Draw(_shader,mainCamera);
+
+        //_model.Draw(mainCamera);
+        _model.Draw(phong_shader,mainCamera);
         _light.Draw(mainCamera);
 
 
