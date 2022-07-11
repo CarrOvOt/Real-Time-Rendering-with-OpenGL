@@ -42,8 +42,8 @@ void main(){
 
     //FragColor = vec4(VertColor*(ambient + diffuse + specular), 1.0f);
     FragColor = vec4(VertColor*light_all, 1.0f);
+    
+    
 
-    
-    
-    
+   
 }

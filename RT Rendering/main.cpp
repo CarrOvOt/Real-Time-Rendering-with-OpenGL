@@ -216,7 +216,7 @@ int main(){
     // mesh & shader & camera
     Model _model = Model(SHAPE::CUBE, glm::vec3(1.0f, 1.0f, 1.0f));
     Model _light = Model(SHAPE::CUBE, glm::vec3(1.0f, 1.0f, 1.0f));
-    Shader phong_shader = Shader("Shaders/Phong.vs", "Shaders/Phong.fs");
+    Shader phong_shader = Shader("Shaders/Gouraud.vert", "Shaders/Gouraud.frag");
 
 
 

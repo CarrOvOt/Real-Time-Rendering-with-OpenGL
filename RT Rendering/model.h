@@ -21,7 +21,7 @@ public:
 	void Draw(Shader& shader, Camera& camera);
 
 private:
-
+	
 
 
 };

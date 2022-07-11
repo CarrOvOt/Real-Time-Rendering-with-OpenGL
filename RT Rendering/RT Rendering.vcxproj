@@ -592,10 +592,12 @@
     <None Include="External\include\glm\gtx\vector_angle.inl" />
     <None Include="External\include\glm\gtx\vector_query.inl" />
     <None Include="External\include\glm\gtx\wrap.inl" />
-    <None Include="Shaders\Phong.fs" />
-    <None Include="Shaders\pure.fs" />
-    <None Include="Shaders\pure.vs" />
-    <None Include="Shaders\Phong.vs" />
+    <None Include="Shaders\Gouraud.frag" />
+    <None Include="Shaders\Gouraud.vert" />
+    <None Include="Shaders\Phong.frag" />
+    <None Include="Shaders\pure.frag" />
+    <None Include="Shaders\pure.vert" />
+    <None Include="Shaders\Phong.vert" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\GLFW\lib\glfw3.lib" />

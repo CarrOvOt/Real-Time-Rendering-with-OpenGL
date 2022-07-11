@@ -223,3 +223,17 @@ QE：上下移动（世界空间）
 [基础光照 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/02%20Lighting/02%20Basic%20Lighting/#_7)
 
 [枚举、按位与或运算、位移的简单应用 - 连程 - 博客园 (cnblogs.com)](https://www.cnblogs.com/anxin1225/p/4063610.html)
+
+### ver0.91
+
+**Gouraud着色（Gouraud Shading）**
+
+Gouraud着色就是Phong着色的顶点着色器实现版本，在顶点上计算光照，然后插值在片面上，因为顶点数量比片段少很多，所以速度很快，但是在顶点数量很少的时候，比如我们的立方体，渲染结果会非常差。
+
+![](MDImages/2022-07-11-23-27-56-image.png)
+
+
+
+### ver0.92
+
+**TODO：材质**

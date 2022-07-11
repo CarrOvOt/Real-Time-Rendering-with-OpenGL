@@ -977,8 +977,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="External\GLFW\lib\glfw3.dll" />
-    <None Include="Shaders\Phong.vs" />
-    <None Include="Shaders\Phong.fs" />
+    <None Include="Shaders\Phong.vert" />
+    <None Include="Shaders\Phong.frag" />
     <None Include="External\include\glm\detail\func_common.inl">
       <Filter>头文件</Filter>
     </None>
@@ -1387,8 +1387,10 @@
     <None Include="External\include\glm\gtx\wrap.inl">
       <Filter>头文件</Filter>
     </None>
-    <None Include="Shaders\pure.fs" />
-    <None Include="Shaders\pure.vs" />
+    <None Include="Shaders\pure.frag" />
+    <None Include="Shaders\pure.vert" />
+    <None Include="Shaders\Gouraud.frag" />
+    <None Include="Shaders\Gouraud.vert" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\GLFW\lib\glfw3.lib" />

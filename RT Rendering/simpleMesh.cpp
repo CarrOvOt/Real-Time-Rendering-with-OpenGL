@@ -131,7 +131,7 @@ SimpleMesh::SimpleMesh(SHAPE shape, glm::vec3 color): Color(color) {
     }
     setupMesh();
 
-    DefaultShader = Shader("Shaders/pure.vs", "Shaders/pure.fs");
+    DefaultShader = Shader("Shaders/pure.vert", "Shaders/pure.frag");
 
 }
 
