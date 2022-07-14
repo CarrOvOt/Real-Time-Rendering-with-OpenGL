@@ -232,8 +232,33 @@ Gouraud着色就是Phong着色的顶点着色器实现版本，在顶点上计�
 
 ![](MDImages/2022-07-11-23-27-56-image.png)
 
-
-
 ### ver0.92
 
-**TODO：材质**
+**简单的材质**
+
+在之前的Phong着色和Gouraud着色中，光照由环境光照ambient，漫反射光照diffuse，镜面反射光照specular组成，并且每一种光照都分别由一个强度系数控制，可以说这个系数就是物体的材质信息，决定了这个物体要如何反射/吸收光线，加上反光度（Shininess），我们就得到了一个简单的材质的定义：
+
+```cpp
+struct Material {
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
+}; 
+```
+
+当然，光源也有类似的属性（不过现在还不明白光源在物理上是如何能够分别影响漫反射和镜面反射的强度的，这个再之后的学习中再留意，但目前我们的光照模型就这样定义吧）：
+
+```cpp
+struct Light {
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+```
+
+最终的光照强度就由材质和光源的强度系数共同控制。
+
+相较于之前的代码，我们只是将相关的参数进行一些整理而已。
+
+参考资料：[材质 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/02%20Lighting/03%20Materials/#_1)

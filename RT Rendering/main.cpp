@@ -52,21 +52,29 @@ float rot_y = 0.0f;
 float rot_z = 0.0f;
 float scale_xyz = 1.0f;
 float trans_x = 0.0f;
-glm::vec3 model_color = glm::vec3(0.2f, 0.5f, 0.5f);
-int model_shininess = 32;
+//glm::vec3 model_color = glm::vec3(0.2f, 0.5f, 0.5f);
+
 
 int lighting_mode = 1;
-
 glm::vec3 light_pos = glm::vec3(0.8f, 0.4f, 1.5f);
-glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
-
-glm::vec3 ambient_color = glm::vec3(1.0f, 1.0f, 1.0f);
-float ambient_strength = 0.1f;
-
-float specular_strength = 0.5f;
 
 
 
+struct Material {
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+    float shininess;
+};
+
+struct Light {
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+};
+
+Material model_material{ glm::vec3(0.2f,0.5f,0.2f),glm::vec3(0.2f,0.5f,0.2f), glm::vec3(0.2f,0.5f,0.2f), 0.25f};
+Light light_strength{ glm::vec3(0.2f,0.2f,0.2f), glm::vec3(0.5f,0.5f,0.5f) ,glm::vec3(1.0f,1.0f,1.0f) };
 
 // rendering gui window
 void GUITick() {
@@ -95,8 +103,13 @@ void GUITick() {
             ImGui::SliderFloat("rot_z", &rot_z, -180.0f, 180.0);
             ImGui::SliderFloat("scale_xyz", &scale_xyz, 0.1f, 5.0f);
             ImGui::SliderFloat("trans_x", &trans_x, -10.0f, 10.0f);
-            ImGui::ColorEdit3("model color", (float*)&model_color);
-            ImGui::SliderInt("model shininess", &model_shininess,1,256);
+            //ImGui::ColorEdit3("model color", (float*)&model_color);
+            
+            ImGui::Spacing();
+            ImGui::ColorEdit3("model ambient", (float*)&model_material.ambient);
+            ImGui::ColorEdit3("model diffuse", (float*)&model_material.diffuse);
+            ImGui::ColorEdit3("model specular", (float*)&model_material.specular);
+            ImGui::SliderFloat("model shininess", &model_material.shininess, 0, 1);
         }
         ImGui::Spacing();
 
@@ -107,12 +120,13 @@ void GUITick() {
         ImGui::Spacing();
 
         ImGui::DragFloat3("light pos_xyz", (float*)&light_pos, 0.05f, -10.0f, -10.0f);
-        ImGui::ColorEdit3("light color", (float*)&light_color);
+        ImGui::ColorEdit3("light ambient", (float*)&light_strength.ambient);
+        ImGui::ColorEdit3("light diffuse", (float*)&light_strength.diffuse);
+        ImGui::ColorEdit3("light specular", (float*)&light_strength.specular);
+
         ImGui::Spacing();
 
-        ImGui::ColorEdit3("ambient color", (float*)&ambient_color);
-        ImGui::SliderFloat("ambient strength", &ambient_strength, 0.0f, 1.0f);
-        ImGui::SliderFloat("specular strength", &specular_strength, 0.0f, 1.0f);
+        
 
         ImGui::Spacing();
 
@@ -216,7 +230,7 @@ int main(){
     // mesh & shader & camera
     Model _model = Model(SHAPE::CUBE, glm::vec3(1.0f, 1.0f, 1.0f));
     Model _light = Model(SHAPE::CUBE, glm::vec3(1.0f, 1.0f, 1.0f));
-    Shader phong_shader = Shader("Shaders/Gouraud.vert", "Shaders/Gouraud.frag");
+    Shader phong_shader = Shader("Shaders/Phong.vert", "Shaders/Phong.frag");
 
 
 
@@ -241,9 +255,8 @@ int main(){
 
         _light.tranform= glm::translate(glm::mat4(1.0f), light_pos) * glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 0.1f, 0.1f));
         SimpleMesh* m = (SimpleMesh*)_light.meshes[0];
-        m->SetColor(light_color);
+        m->SetColor(light_strength.diffuse);
         
-
         glClearColor(background_color.x, background_color.y, background_color.z, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
 
@@ -252,15 +265,20 @@ int main(){
 
         phong_shader.use();
         phong_shader.setInt("lighting_mode", lighting_mode);
-        phong_shader.setVec3("model_color", model_color);
-        phong_shader.setVec3("ambient_color", ambient_color);
-        phong_shader.setFloat("ambient_strength", ambient_strength);
-        phong_shader.setVec3("light_pos", light_pos);
-        phong_shader.setVec3("light_color", light_color);
-        phong_shader.setVec3("camera_pos", mainCamera.Position);
-        phong_shader.setFloat("specular_strength", specular_strength);
-        phong_shader.setInt("shininess", model_shininess);
 
+
+        phong_shader.setVec3("material.ambient", model_material.ambient);
+        phong_shader.setVec3("material.diffuse", model_material.diffuse);
+        phong_shader.setVec3("material.specular", model_material.specular);
+        phong_shader.setFloat("material.shininess", model_material.shininess);
+
+        phong_shader.setVec3("light.pos", light_pos);
+        phong_shader.setVec3("light.ambient", light_strength.ambient);
+        phong_shader.setVec3("light.diffuse", light_strength.diffuse);
+        phong_shader.setVec3("light.specular", light_strength.specular);
+
+
+        phong_shader.setVec3("camera_pos", mainCamera.Position);
 
         //_model.Draw(mainCamera);
         _model.Draw(phong_shader,mainCamera);
