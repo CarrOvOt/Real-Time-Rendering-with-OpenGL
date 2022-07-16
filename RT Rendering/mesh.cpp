@@ -24,6 +24,7 @@ void Mesh::Draw(Shader& shader, Camera& camera, glm::mat4 parent_trans){
 
 	// bind textures
 	unsigned int diffuseNr = 1;
+    unsigned int specularNr = 1;
 
 	for (unsigned int i = 0; i < Textures.size(); ++i) {
 		glActiveTexture(GL_TEXTURE0 + i);
@@ -31,6 +32,9 @@ void Mesh::Draw(Shader& shader, Camera& camera, glm::mat4 parent_trans){
 		if (Textures[i].type == DIFFUSE) {
 			name = "texture_diffuse" + std::to_string(diffuseNr++);
 		}
+        if (Textures[i].type == SPECULAR) {
+            name = "texture_specular" + std::to_string(specularNr++);
+        }
 		shader.setInt(name.c_str(), i);
 		glBindTexture(GL_TEXTURE_2D, Textures[i].id);
 	}

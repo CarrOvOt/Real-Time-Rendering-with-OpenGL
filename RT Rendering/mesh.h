@@ -17,7 +17,8 @@
 using namespace std;
 
 enum TEXTURE_TYPE {
-	DIFFUSE
+	DIFFUSE,
+	SPECULAR
 };
 
 struct Vertex {

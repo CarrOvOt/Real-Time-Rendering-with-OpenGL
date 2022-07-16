@@ -85,30 +85,8 @@ SimpleMesh::SimpleMesh(){
         Indices.emplace_back(CubeIndic[i]);
     }
 
-        
-
-    // generate and bind texture
-    unsigned int texture_id;
-    stbi_set_flip_vertically_on_load(true); // flip y-axis
-    int width, height, nrChannels;
-    unsigned char* data = stbi_load("./Resource/dice.png", &width, &height, &nrChannels, 0);
-    if (!data) std::cout << "Failed to load texture" << std::endl;
-
-    glGenTextures(1, &texture_id);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-
-    // free data after bind texture
-    stbi_image_free(data);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    Texture texture;
-    texture.id = texture_id;
-    texture.type = TEXTURE_TYPE::DIFFUSE;
-
-    Textures.emplace_back(texture);
+    Textures.emplace_back(loadTexture("./Resource/09diffuse.png",TEXTURE_TYPE::DIFFUSE));
+    Textures.emplace_back(loadTexture("./Resource/09specular.png", TEXTURE_TYPE::SPECULAR));
 
     
     setupMesh();
@@ -151,6 +129,27 @@ void SimpleMesh::Draw(Camera& camera, glm::mat4 parent_trans){
 
 void SimpleMesh::SetColor(glm::vec3 color){
     Color = color;
+}
+
+Texture SimpleMesh::loadTexture(string file_path, TEXTURE_TYPE type){
+    // generate and bind texture
+    unsigned int texture_id;
+    stbi_set_flip_vertically_on_load(true); // flip y-axis
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load(file_path.c_str(), &width, &height, &nrChannels, 0);
+    if (!data) std::cout << "Failed to load texture" << std::endl;
+
+    glGenTextures(1, &texture_id);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    // free data after bind texture
+    stbi_image_free(data);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    return Texture{texture_id, type};
 }
 
 

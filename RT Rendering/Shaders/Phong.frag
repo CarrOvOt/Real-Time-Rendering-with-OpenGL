@@ -18,6 +18,8 @@ struct Light{
 in vec3 VertColor;
 in vec3 VertPos;
 in vec3 VertNormal;
+in vec2 VertTexCoord;
+
 
 out vec4 FragColor;
 
@@ -29,6 +31,7 @@ uniform vec3 camera_pos;
 
 
 uniform sampler2D texture_diffuse1;
+uniform sampler2D texture_specular1;
 
 void main(){
        
@@ -38,21 +41,22 @@ void main(){
     vec3 light_dir_reflect = reflect(-light_dir, norm);
 
     // ambient
-    vec3 ambient = light.ambient * material.ambient;
+    vec3 ambient = light.ambient * material.ambient * texture(texture_diffuse1,VertTexCoord).rgb;
 
     // diffuse
     float diff = max(dot(norm, light_dir), 0.0);
-    vec3 diffuse = diff * light.diffuse * material.diffuse;
+    vec3 diffuse = diff * light.diffuse * material.diffuse * texture(texture_diffuse1,VertTexCoord).rgb;
 
     // specular
-    float spec = pow(max(dot(view_dir, light_dir_reflect), 0.0), 128*material.shininess);
-    vec3 specular = spec * light.specular * material.specular;
+    float spec = pow(max(dot(view_dir, light_dir_reflect), 0.0), 128 * material.shininess);
+    vec3 specular = spec * light.specular * material.specular * texture(texture_specular1,VertTexCoord).rgb;
 
     vec3 light_all=((lighting_mode)&1)*(ambient + diffuse + specular)+((lighting_mode>>1)&1)*ambient+((lighting_mode>>2)&1)*diffuse+((lighting_mode>>3)&1)*specular;  
 
-    //FragColor = vec4(VertColor*(ambient + diffuse + specular), 1.0f);
+
+    //FragColor = texture(texture_diffuse1,VertTexCoord);
+    //FragColor = vec4(VertTexCoord,1.0f, 1.0f);
     FragColor = vec4(light_all, 1.0f);
     
-
    
 }

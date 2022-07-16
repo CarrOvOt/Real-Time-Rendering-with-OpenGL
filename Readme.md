@@ -262,3 +262,21 @@ struct Light {
 相较于之前的代码，我们只是将相关的参数进行一些整理而已。
 
 参考资料：[材质 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/02%20Lighting/03%20Materials/#_1)
+
+### ver0.93
+
+**材质纹理**
+
+上面我们用一个结构体存储了一个mesh的材质，现在我们用一个贴图/纹理来表示这些材质参数，这样就可以在一个mesh上同时展示出不同材质的效果。
+
+除了我们之前已经用到的漫反射贴图，我们还加入了镜面光贴图。
+
+![](MDImages/2022-07-16-19-36-31-image.png)
+
+参考资料：[光照贴图 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/02%20Lighting/04%20Lighting%20maps/)
+
+
+
+### ver1.0
+
+**TODO：光照（Light）**

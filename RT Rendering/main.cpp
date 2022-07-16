@@ -73,7 +73,7 @@ struct Light {
     glm::vec3 specular;
 };
 
-Material model_material{ glm::vec3(0.2f,0.5f,0.2f),glm::vec3(0.2f,0.5f,0.2f), glm::vec3(0.2f,0.5f,0.2f), 0.25f};
+Material model_material{ glm::vec3(1.0f,1.0f,1.0f),glm::vec3(1.0f,1.0f,1.0f), glm::vec3(1.0f,1.0f,1.0f), 0.25f};
 Light light_strength{ glm::vec3(0.2f,0.2f,0.2f), glm::vec3(0.5f,0.5f,0.5f) ,glm::vec3(1.0f,1.0f,1.0f) };
 
 // rendering gui window
@@ -228,7 +228,7 @@ int main(){
 
    
     // mesh & shader & camera
-    Model _model = Model(SHAPE::CUBE, glm::vec3(1.0f, 1.0f, 1.0f));
+    Model _model = Model();
     Model _light = Model(SHAPE::CUBE, glm::vec3(1.0f, 1.0f, 1.0f));
     Shader phong_shader = Shader("Shaders/Phong.vert", "Shaders/Phong.frag");
 

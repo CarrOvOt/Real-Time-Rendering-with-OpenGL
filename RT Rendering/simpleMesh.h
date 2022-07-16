@@ -32,6 +32,8 @@ private:
 
 	glm::vec3 Color = glm::vec3(0.5f, 0.5f, 0.5f);
 
+	Texture loadTexture(string file_path, TEXTURE_TYPE type);
+
 	
 		
 };
