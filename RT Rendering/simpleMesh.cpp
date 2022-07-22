@@ -69,6 +69,18 @@ static unsigned int CubeIndic[] = {
     30,31,32,  33,34,35,
 };
 
+static float RectVert[] = {
+    // position                 // normal           // texture coordinate  
+    0.5f,   0.5f,   0.0f,       0.0f,0.0f,1.0f,     0.5f,   0.5f,
+    -0.5f,  0.5f,   0.0f,       0.0f,0.0f,1.0f,     -0.5f,  0.5f,
+    -0.5f,  -0.5f,  0.0f,       0.0f,0.0f,1.0f,     -0.5f,  -0.5f,
+    0.5f,   -0.5f,  0.0f,       0.0f,0.0f,1.0f,     0.5f,   -0.5f,
+};
+
+static unsigned int RectIndic[] = {
+    2,3,0,
+    2,0,1,
+};
 
 
 
@@ -85,14 +97,31 @@ SimpleMesh::SimpleMesh(){
         Indices.emplace_back(CubeIndic[i]);
     }
 
-    Textures.emplace_back(loadTexture("./Resource/09diffuse.png",TEXTURE_TYPE::DIFFUSE));
-    Textures.emplace_back(loadTexture("./Resource/09specular.png", TEXTURE_TYPE::SPECULAR));
+    Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_COL_1K.jpg",TEXTURE_TYPE::DIFFUSE));
+    Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_REFL_1K.jpg", TEXTURE_TYPE::SPECULAR));
 
     
     setupMesh();
 }
 
-SimpleMesh::SimpleMesh(SHAPE shape, glm::vec3 color): Color(color) {
+SimpleMesh::SimpleMesh(SHAPE shape){
+
+    if (shape == RECT) {
+        for (int i = 0; i < 4; ++i) {
+            Vertex v;
+            v.Position = glm::vec3(RectVert[i * 8], RectVert[i * 8 + 1], RectVert[i * 8 + 2]);
+            v.Normal = glm::vec3(RectVert[i * 8 + 3], RectVert[i * 8 + 4], RectVert[i * 8 + 5]);
+            v.TexCoord = glm::vec2(RectVert[i * 8 + 6], RectVert[i * 8 + 7]);
+            Vertices.emplace_back(v);
+        }
+        for (int i = 0; i < 6; ++i) {
+            Indices.emplace_back(RectIndic[i]);
+        }
+
+        Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_COL_1K.jpg", TEXTURE_TYPE::DIFFUSE));
+        Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_REFL_1K.jpg", TEXTURE_TYPE::SPECULAR));
+
+    }
 
     if (shape == CUBE) {
         for (int i = 0; i < 36; ++i) {
@@ -106,30 +135,14 @@ SimpleMesh::SimpleMesh(SHAPE shape, glm::vec3 color): Color(color) {
             Indices.emplace_back(CubeIndic[i]);
         }
 
+        Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_COL_1K.jpg", TEXTURE_TYPE::DIFFUSE));
+        Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_REFL_1K.jpg", TEXTURE_TYPE::SPECULAR));
     }
+
     setupMesh();
 
-    DefaultShader = Shader("Shaders/pure.vert", "Shaders/pure.frag");
-
 }
 
-void SimpleMesh::Draw(Camera& camera, glm::mat4 parent_trans){
-    DefaultShader.use();
-    DefaultShader.setVec3("pure_color", Color);
-
-    DefaultShader.setMat4("model_sp", parent_trans * Transform);
-    DefaultShader.setMat4("view_sp", camera.GetViewMatrix());
-    DefaultShader.setMat4("proj_sp", camera.GetProjMatrix());
-
-
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(Indices.size()), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-}
-
-void SimpleMesh::SetColor(glm::vec3 color){
-    Color = color;
-}
 
 Texture SimpleMesh::loadTexture(string file_path, TEXTURE_TYPE type){
     // generate and bind texture
@@ -142,7 +155,16 @@ Texture SimpleMesh::loadTexture(string file_path, TEXTURE_TYPE type){
     glGenTextures(1, &texture_id);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    if (nrChannels == 3) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    }
+    else if (nrChannels == 4) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    }
+    else {
+        std::cout << "Texture channel is neither 3 nor 4"<< std::endl;
+    }
+
     glGenerateMipmap(GL_TEXTURE_2D);
 
     // free data after bind texture

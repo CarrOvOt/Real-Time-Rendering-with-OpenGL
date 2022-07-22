@@ -47,7 +47,7 @@ bool showMouse = true;
 // options & settings in GUI
 bool use_wireframe_mode = false;
 
-glm::vec3 background_color = glm::vec3(0.2f, 0.2f, 0.2f );
+glm::vec3 background_color = glm::vec3(0.0f, 0.0f, 0.0f );
 
 float rot_y = 0.0f;
 float rot_z = 0.0f;
@@ -62,8 +62,8 @@ float light_point_power=1.0f;
 glm::vec3 light_dir_rot = glm::vec3(0.0f, 0.0f, 0.0f);
 float light_dir_power = 1.0f;
 
-glm::vec3 light_spot_pos = glm::vec3(-0.2f, 0.4f, 1.5f);
-glm::vec3 light_spot_rot = glm::vec3(60.0f, 0.0f, 0.0f);
+glm::vec3 light_spot_pos = glm::vec3(0.1f, 0.1f, 0.0f);
+glm::vec3 light_spot_rot = glm::vec3(-45.0f, 0.0f, 0.0f);
 float light_spot_power = 1.0f;
 
 
@@ -222,15 +222,26 @@ int main(){
 
    
     // mesh & shader & camera
-    Model _model = Model();
+    Model _model = Model(SHAPE::CUBE);
+    Model floor = Model(SHAPE::RECT);
+
     PointLight _light_point = PointLight();
     DirLight _light_dir = DirLight();
     SpotLight _light_spot = SpotLight();
+
     Shader phong_shader = Shader("Shaders/Phong.vert", "Shaders/Phong.frag");
     //mainCamera.type = CAMERATYPE::ORTHO;
 
+
+    glm::mat4 floor_sp = glm::scale(glm::mat4(1.0f), glm::vec3(7.0f));
+    floor_sp = glm::rotate(glm::mat4(1.0f), glm::radians(-80.0f), glm::vec3(1.0, 0.0, 0.0)) * floor_sp;
+    floor_sp = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.3f, -2.0f)) * floor_sp;
+    floor.transform = floor_sp;
+
+
     // GL settings
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_FRAMEBUFFER_SRGB);
 
     // rendering loop
     while (!glfwWindowShouldClose(window)){
@@ -302,8 +313,10 @@ int main(){
 
         phong_shader.setVec3("camera_pos", mainCamera.Position);
 
-        //_model.Draw(mainCamera);
-        _model.Draw(phong_shader,mainCamera);
+        //_model.Draw(phong_shader,mainCamera);
+        floor.Draw(phong_shader, mainCamera);
+
+
         _light_point.Draw(mainCamera);
         _light_dir.Draw(mainCamera);
         _light_spot.Draw(mainCamera);

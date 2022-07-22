@@ -4,7 +4,7 @@
 
 &nbsp;
 
-一些LearnOpenGL教程里没有的东西：
+一些LearnOpenGL教程里没有的东西&一些自己的理解：
 
 [ImGUI的简单使用](./documents/ImGUI-usage.md)
 
@@ -50,7 +50,7 @@ pipeline：
 
 &nbsp;
 
-### ver0.21
+### ver0.2.1
 
 **整理代码，将着色器程序，顶点数据单独构建成类**
 
@@ -128,7 +128,7 @@ Mesh：加载顶点数据，生成VAO，VBO，EBO，以及主循环中使用的D
 
 &nbsp;
 
-### ver0.61
+### ver0.6.1
 
 **整理代码**
 
@@ -234,7 +234,7 @@ QE：上下移动（世界空间）
 
 [枚举、按位与或运算、位移的简单应用 - 连程 - 博客园 (cnblogs.com)](https://www.cnblogs.com/anxin1225/p/4063610.html)
 
-### ver0.91
+### ver0.9.1
 
 **Gouraud着色（Gouraud Shading）**
 
@@ -242,7 +242,7 @@ Gouraud着色就是Phong着色的顶点着色器实现版本，在顶点上计�
 
 ![](MDImages/2022-07-11-23-27-56-image.png)
 
-### ver0.92
+### ver0.9.2
 
 **简单的材质**
 
@@ -273,7 +273,7 @@ struct Light {
 
 参考资料：[材质 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/02%20Lighting/03%20Materials/#_1)
 
-### ver0.93
+### ver0.9.3
 
 **材质纹理**
 
@@ -308,3 +308,29 @@ struct Light {
 [GAMES101-现代计算机图形学入门-闫令琪_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1X7411F744?p=7&vd_source=60c102f9b5913c1d3865f271848a154a)
 
 [OpenGl 基本函数 glDrawArrays 详解_frank06504的博客-CSDN博客](https://blog.csdn.net/frank06504/article/details/117523329)
+
+### ver1.1
+
+**Gamma校正**
+
+上面的光照模型中光的能量和距离的平方的倒数成正比，但是实际会发现光照衰减得非常快，这里就涉及到了[Gamma校正](./documents/gamma-correction.md)。
+
+总之就是在光照计算之前把颜色映射到线性空间，最终计算完成后将输出映射回sRGB空间。
+
+<img title="" src="MDImages/2022-07-23-01-59-26-image.png" alt="" width="462"><img src="MDImages/2022-07-23-02-00-55-image.png" title="" alt="" width="463">
+
+上图无Gamma校正，下图有Gamma校正
+
+可以看到ImGUI也经过了Gamma校正，所以整体偏亮，这个问题之后再解决。
+
+
+
+参考资料：
+
+[Gamma校正 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/05%20Advanced%20Lighting/02%20Gamma%20Correction/)
+
+[色彩校正中的 gamma 值是什么？ - 韩世麟的回答 - 知乎](https://www.zhihu.com/question/27467127/answer/37555901)
+
+### ver1.1.1
+
+**TODO: Blinn-Phong Shading**

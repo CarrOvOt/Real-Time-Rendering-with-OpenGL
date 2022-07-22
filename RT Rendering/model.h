@@ -15,9 +15,8 @@ public:
 	vector<Texture> texturesLoaded;
 
 	Model();
-	Model(SHAPE shape,glm::vec3 color);
+	Model(SHAPE shape);
 
-	void Draw(Camera& camera);
 	void Draw(Shader& shader, Camera& camera);
 
 private:

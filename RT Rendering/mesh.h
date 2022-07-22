@@ -43,7 +43,6 @@ public:
 	Mesh();
 	Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures);
 
-	void virtual Draw(Camera& camera, glm::mat4 parent_trans); // Draw with default shader, and now ONLY SimpleMesh use this.
 
 	void Draw(Shader& shader, Camera& camera, glm::mat4 parent_trans);
 
@@ -53,8 +52,6 @@ protected:
 	vector<Vertex> Vertices;
 	vector<unsigned int> Indices;
 	vector<Texture> Textures;
-
-	Shader DefaultShader;
 
 	void setupMesh();
 

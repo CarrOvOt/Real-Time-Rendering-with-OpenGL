@@ -9,9 +9,6 @@ Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture
     this->Textures = textures;
 }
 
-void Mesh::Draw(Camera& camera, glm::mat4 parent_trans){
-    std::cout << "Please provide a shader for noraml mesh rendering" << std::endl;
-}
 
 
 void Mesh::Draw(Shader& shader, Camera& camera, glm::mat4 parent_trans){
