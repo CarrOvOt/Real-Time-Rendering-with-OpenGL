@@ -4,6 +4,16 @@
 
 &nbsp;
 
+一些LearnOpenGL教程里没有的东西：
+
+[ImGUI的简单使用](./documents/ImGUI-usage.md)
+
+[关于纹理坐标](./documents/texture.md)
+
+[立方体的法线](./documents/cube-shading.md)
+
+[billboard效果](./documents/billboard.md)
+
 ### ver0.1
 
 **搭建基础环境，能够显示出一个窗口。**
@@ -275,8 +285,26 @@ struct Light {
 
 参考资料：[光照贴图 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/02%20Lighting/04%20Lighting%20maps/)
 
-
-
 ### ver1.0
 
-**TODO：光照（Light）**
+**光照（Light）**
+
+之前我们使用的是一个简单的点光源，且强度不随距离变化，现在我们优化一下光照强度和距离的关系，然后加入平行光和聚光（Spotlight），并且把光源从simplemesh中独立出来，构成新的类。
+
+关于光照强度的部分我们参考game101课程中 ”能量“ 的概念来计算强度随距离的衰减（blender的光源也是这样设置的）。
+
+点光源我们用一个小圆圈表示，并且这个小圆圈会一直面对摄像机，也就是说无论我们从什么角度观察它，它也不会变成椭圆，这就是billboard（广告牌）效果。这是一个[简单说明](./documents/billboard.md)。
+
+平行光我们用三条平行线段表示，因为我们需要知道平行光的方向，所以这里就不用billboard效果了。
+
+聚光使用三角形加一条线段表示，同样受到位置方向的影响，不使用billboard。
+
+![](MDImages/2022-07-22-12-42-36-image.png)
+
+参考资料：
+
+[投光物 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/02%20Lighting/05%20Light%20casters/#_1)
+
+[GAMES101-现代计算机图形学入门-闫令琪_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1X7411F744?p=7&vd_source=60c102f9b5913c1d3865f271848a154a)
+
+[OpenGl 基本函数 glDrawArrays 详解_frank06504的博客-CSDN博客](https://blog.csdn.net/frank06504/article/details/117523329)

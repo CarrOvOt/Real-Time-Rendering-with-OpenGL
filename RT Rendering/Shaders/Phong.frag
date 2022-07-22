@@ -8,7 +8,11 @@ struct Material {
 }; 
 
 struct Light{
-    vec3 pos;
+    vec3 pos;   // used for point light and spot light
+    vec3 dir;   // used for directed light and spot light
+    float cosR1,cosR2; // used for spot light
+
+    float power;
 
     vec3 ambient;
     vec3 diffuse;
@@ -23,40 +27,93 @@ in vec2 VertTexCoord;
 
 out vec4 FragColor;
 
-uniform int lighting_mode;
-
 uniform Material material;
-uniform Light light;
+
+uniform Light point_light;
+uniform Light dir_light;
+uniform Light spot_light;
+
+
 uniform vec3 camera_pos;
 
 
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_specular1;
 
-void main(){
-       
-    vec3 norm = normalize(VertNormal);
+
+
+vec3 CalcDirLight(Light light, vec3 normal,vec3 view_dir){
+    
+    vec3 light_dir = normalize(-light.dir);
+    vec3 light_dir_reflect = reflect(-light_dir, normal);
+
+    // ambient
+    vec3 ambient  = light.ambient  * texture(texture_diffuse1, VertTexCoord).rgb;
+    // diffuse
+    float diff = max(dot(normal, light_dir), 0.0);
+    vec3 diffuse  = light.diffuse  * diff * texture(texture_diffuse1, VertTexCoord).rgb;
+    // specular
+    float spec = pow(max(dot(view_dir, light_dir_reflect), 0.0), 128 * material.shininess);
+    vec3 specular = light.specular * spec * texture(texture_diffuse1, VertTexCoord).rgb;
+
+    return (ambient + diffuse + specular) * light.power;
+};
+
+vec3 CalcPointLight(Light light, vec3 norm,vec3 view_dir){
+
+    float dist = length(light.pos - VertPos);
+    float light_strength = light.power/(dist*dist);
+
     vec3 light_dir = normalize(light.pos - VertPos);
-    vec3 view_dir = normalize(camera_pos - VertPos);
     vec3 light_dir_reflect = reflect(-light_dir, norm);
 
     // ambient
-    vec3 ambient = light.ambient * material.ambient * texture(texture_diffuse1,VertTexCoord).rgb;
-
+    vec3 ambient = light.ambient * texture(texture_diffuse1,VertTexCoord).rgb;
     // diffuse
     float diff = max(dot(norm, light_dir), 0.0);
-    vec3 diffuse = diff * light.diffuse * material.diffuse * texture(texture_diffuse1,VertTexCoord).rgb;
-
+    vec3 diffuse = diff * light.diffuse * texture(texture_diffuse1,VertTexCoord).rgb;
     // specular
     float spec = pow(max(dot(view_dir, light_dir_reflect), 0.0), 128 * material.shininess);
-    vec3 specular = spec * light.specular * material.specular * texture(texture_specular1,VertTexCoord).rgb;
+    vec3 specular = spec * light.specular * texture(texture_specular1,VertTexCoord).rgb;
 
-    vec3 light_all=((lighting_mode)&1)*(ambient + diffuse + specular)+((lighting_mode>>1)&1)*ambient+((lighting_mode>>2)&1)*diffuse+((lighting_mode>>3)&1)*specular;  
-
-
-    //FragColor = texture(texture_diffuse1,VertTexCoord);
-    //FragColor = vec4(VertTexCoord,1.0f, 1.0f);
-    FragColor = vec4(light_all, 1.0f);
-    
+    return (ambient + diffuse + specular)* light_strength;
    
+};
+
+vec3 CalcSpotLight(Light light, vec3 norm,vec3 view_dir){
+
+    float dist = length(light.pos - VertPos);
+    float light_strength = light.power/(dist*dist);
+
+    vec3 light_dir = normalize(light.pos - VertPos);
+    vec3 light_dir_reflect = reflect(-light_dir, norm);
+
+    float theta = dot(light_dir, normalize(-light.dir));
+    float intensity = clamp((theta - light.cosR2) / (light.cosR1-light.cosR2), 0.0, 1.0); 
+
+    // ambient
+    vec3 ambient = light.ambient * texture(texture_diffuse1,VertTexCoord).rgb;
+    // diffuse
+    float diff = max(dot(norm, light_dir), 0.0);
+    vec3 diffuse = diff * light.diffuse * texture(texture_diffuse1,VertTexCoord).rgb;
+    // specular
+    float spec = pow(max(dot(view_dir, light_dir_reflect), 0.0), 128 * material.shininess);
+    vec3 specular = spec * light.specular * texture(texture_specular1,VertTexCoord).rgb;
+
+    return (ambient + diffuse * intensity + specular * intensity)* light_strength;
+   
+};
+
+
+
+
+void main(){
+
+    vec3 norm = normalize(VertNormal);
+    vec3 view_dir = normalize(camera_pos - VertPos);
+
+    vec3 light_all = CalcPointLight(point_light,norm,view_dir) + CalcDirLight(dir_light,norm,view_dir) + CalcSpotLight(spot_light,norm,view_dir);
+
+    FragColor = vec4(light_all, 1.0f);
+
 }

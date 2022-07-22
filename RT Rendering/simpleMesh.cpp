@@ -117,7 +117,7 @@ void SimpleMesh::Draw(Camera& camera, glm::mat4 parent_trans){
     DefaultShader.use();
     DefaultShader.setVec3("pure_color", Color);
 
-    DefaultShader.setMat4("model_sp", parent_trans * Tranform);
+    DefaultShader.setMat4("model_sp", parent_trans * Transform);
     DefaultShader.setMat4("view_sp", camera.GetViewMatrix());
     DefaultShader.setMat4("proj_sp", camera.GetProjMatrix());
 

@@ -9,7 +9,7 @@ using namespace std;
 class Model {
 public:
 
-	glm::mat4 tranform=glm::mat4(1.0f);
+	glm::mat4 transform=glm::mat4(1.0f);
 
 	vector<Mesh*> meshes;
 	vector<Texture> texturesLoaded;

@@ -38,7 +38,7 @@ class Mesh {
 
 public:
 
-	glm::mat4 Tranform = glm::mat4(1.0f);
+	glm::mat4 Transform = glm::mat4(1.0f);
 
 	Mesh();
 	Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures);

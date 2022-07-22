@@ -18,7 +18,7 @@ void Mesh::Draw(Shader& shader, Camera& camera, glm::mat4 parent_trans){
 
     shader.use();
 
-    shader.setMat4("model_sp", parent_trans*Tranform);
+    shader.setMat4("model_sp", parent_trans*Transform);
     shader.setMat4("view_sp", camera.GetViewMatrix());
     shader.setMat4("proj_sp", camera.GetProjMatrix());
 

@@ -10,12 +10,12 @@ Model::Model(SHAPE shape, glm::vec3 color){
 
 void Model::Draw(Camera& camera){
 	for (Mesh* mesh : meshes) {
-		mesh->Draw(camera,tranform);
+		mesh->Draw(camera,transform);
 	}
 }
 
 void Model::Draw(Shader& shader, Camera& camera){
 	for (Mesh* mesh : meshes) {
-		mesh->Draw(shader, camera, tranform);
+		mesh->Draw(shader, camera, transform);
 	}
 }

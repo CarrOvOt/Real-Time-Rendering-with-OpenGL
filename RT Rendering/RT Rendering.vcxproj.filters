@@ -921,6 +921,9 @@
     <ClInclude Include="camera.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="light.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\GLAD\src\glad.c">
@@ -972,6 +975,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="camera.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="light.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1391,6 +1397,8 @@
     <None Include="Shaders\pure.vert" />
     <None Include="Shaders\Gouraud.frag" />
     <None Include="Shaders\Gouraud.vert" />
+    <None Include="Shaders\BasicShader\lightDraw.frag" />
+    <None Include="Shaders\BasicShader\lightDraw.vert" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\GLFW\lib\glfw3.lib" />

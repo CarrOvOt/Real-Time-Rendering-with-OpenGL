@@ -18,6 +18,7 @@
 #include "model.h"
 #include "gui.h"
 #include "camera.h"
+#include "light.h"
 
 // others
 #include <iostream>
@@ -55,9 +56,15 @@ float trans_x = 0.0f;
 //glm::vec3 model_color = glm::vec3(0.2f, 0.5f, 0.5f);
 
 
-int lighting_mode = 1;
-glm::vec3 light_pos = glm::vec3(0.8f, 0.4f, 1.5f);
+glm::vec3 light_point_pos = glm::vec3(0.8f, 0.4f, 1.5f);
+float light_point_power=1.0f;
 
+glm::vec3 light_dir_rot = glm::vec3(0.0f, 0.0f, 0.0f);
+float light_dir_power = 1.0f;
+
+glm::vec3 light_spot_pos = glm::vec3(-0.2f, 0.4f, 1.5f);
+glm::vec3 light_spot_rot = glm::vec3(60.0f, 0.0f, 0.0f);
+float light_spot_power = 1.0f;
 
 
 struct Material {
@@ -67,14 +74,8 @@ struct Material {
     float shininess;
 };
 
-struct Light {
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-};
 
 Material model_material{ glm::vec3(1.0f,1.0f,1.0f),glm::vec3(1.0f,1.0f,1.0f), glm::vec3(1.0f,1.0f,1.0f), 0.25f};
-Light light_strength{ glm::vec3(0.2f,0.2f,0.2f), glm::vec3(0.5f,0.5f,0.5f) ,glm::vec3(1.0f,1.0f,1.0f) };
 
 // rendering gui window
 void GUITick() {
@@ -106,28 +107,21 @@ void GUITick() {
             //ImGui::ColorEdit3("model color", (float*)&model_color);
             
             ImGui::Spacing();
-            ImGui::ColorEdit3("model ambient", (float*)&model_material.ambient);
-            ImGui::ColorEdit3("model diffuse", (float*)&model_material.diffuse);
-            ImGui::ColorEdit3("model specular", (float*)&model_material.specular);
             ImGui::SliderFloat("model shininess", &model_material.shininess, 0, 1);
         }
         ImGui::Spacing();
 
-        ImGui::RadioButton("Ambient", &lighting_mode, 1<<1); ImGui::SameLine();
-        ImGui::RadioButton("Diffuse", &lighting_mode, 1<<2); ImGui::SameLine();
-        ImGui::RadioButton("Specular", &lighting_mode, 1<<3); ImGui::SameLine();
-        ImGui::RadioButton("ALL", &lighting_mode, 1); 
+        ImGui::DragFloat3("point light pos_xyz", (float*)&light_point_pos, 0.05f, -10.0f, 10.0f);
+        ImGui::DragFloat("point light power", (float*)&light_point_power, 0.02f, 0.0f, 5.0f);
         ImGui::Spacing();
 
-        ImGui::DragFloat3("light pos_xyz", (float*)&light_pos, 0.05f, -10.0f, -10.0f);
-        ImGui::ColorEdit3("light ambient", (float*)&light_strength.ambient);
-        ImGui::ColorEdit3("light diffuse", (float*)&light_strength.diffuse);
-        ImGui::ColorEdit3("light specular", (float*)&light_strength.specular);
-
+        ImGui::DragFloat3("direction light rot_xyz", (float*)&light_dir_rot, 5.0f, -180.0f, 180.0f);
+        ImGui::DragFloat("direction light power", (float*)&light_dir_power, 0.02f, 0.0f, 5.0f);
         ImGui::Spacing();
 
-        
-
+        ImGui::DragFloat3("spot light pos_xyz", (float*)&light_spot_pos, 0.05f, -10.0f, 10.0f);
+        ImGui::DragFloat3("spot light rot_xyz", (float*)&light_spot_rot, 5.0f, -180.0f, 180.0f);
+        ImGui::DragFloat("spot light power", (float*)&light_spot_power, 0.02f, 0.0f, 5.0f);
         ImGui::Spacing();
 
         ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
@@ -229,10 +223,11 @@ int main(){
    
     // mesh & shader & camera
     Model _model = Model();
-    Model _light = Model(SHAPE::CUBE, glm::vec3(1.0f, 1.0f, 1.0f));
+    PointLight _light_point = PointLight();
+    DirLight _light_dir = DirLight();
+    SpotLight _light_spot = SpotLight();
     Shader phong_shader = Shader("Shaders/Phong.vert", "Shaders/Phong.frag");
-
-
+    //mainCamera.type = CAMERATYPE::ORTHO;
 
     // GL settings
     glEnable(GL_DEPTH_TEST);
@@ -251,11 +246,27 @@ int main(){
         model_sp = glm::rotate(glm::mat4(1.0f), glm::radians(rot_z), glm::vec3(0.0, 0.0, 1.0)) * model_sp;
         model_sp = glm::rotate(glm::mat4(1.0f), glm::radians(rot_y), glm::vec3(0.0, 1.0, 0.0)) * model_sp;
         model_sp = glm::translate(glm::mat4(1.0f), glm::vec3(trans_x, 0.0f, 0.0f))* model_sp;
-        _model.tranform = model_sp;
+        _model.transform = model_sp;
 
-        _light.tranform= glm::translate(glm::mat4(1.0f), light_pos) * glm::scale(glm::mat4(1.0f), glm::vec3(0.1f, 0.1f, 0.1f));
-        SimpleMesh* m = (SimpleMesh*)_light.meshes[0];
-        m->SetColor(light_strength.diffuse);
+
+        _light_point.Transform = glm::translate(glm::mat4(1.0f), light_point_pos);
+        _light_point.Power = light_point_power;
+
+        glm::mat4 light_dir_trans = glm::rotate(glm::mat4(1.0f), glm::radians(light_dir_rot[0]), glm::vec3(1.0, 0.0, 0.0));
+        light_dir_trans = glm::rotate(glm::mat4(1.0f), glm::radians(light_dir_rot[1]), glm::vec3(0.0, 0.0, 1.0)) * light_dir_trans;
+        light_dir_trans = glm::rotate(glm::mat4(1.0f), glm::radians(light_dir_rot[2]), glm::vec3(0.0, 1.0, 0.0)) * light_dir_trans;
+        light_dir_trans[3] = _light_dir.Transform[3];
+        _light_dir.Transform= light_dir_trans;
+        _light_dir.Power = light_dir_power;
+
+
+        glm::mat4 light_spot_trans = glm::rotate(glm::mat4(1.0f), glm::radians(light_spot_rot[0]), glm::vec3(1.0, 0.0, 0.0));
+        light_spot_trans = glm::rotate(glm::mat4(1.0f), glm::radians(light_spot_rot[1]), glm::vec3(0.0, 0.0, 1.0)) * light_spot_trans;
+        light_spot_trans = glm::rotate(glm::mat4(1.0f), glm::radians(light_spot_rot[2]), glm::vec3(0.0, 1.0, 0.0)) * light_spot_trans;
+        light_spot_trans = glm::translate(glm::mat4(1.0f), light_spot_pos) * light_spot_trans;
+        _light_spot.Transform = light_spot_trans;
+        _light_spot.Power = light_spot_power;
+
         
         glClearColor(background_color.x, background_color.y, background_color.z, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
@@ -264,25 +275,38 @@ int main(){
         else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         phong_shader.use();
-        phong_shader.setInt("lighting_mode", lighting_mode);
 
-
-        phong_shader.setVec3("material.ambient", model_material.ambient);
-        phong_shader.setVec3("material.diffuse", model_material.diffuse);
-        phong_shader.setVec3("material.specular", model_material.specular);
         phong_shader.setFloat("material.shininess", model_material.shininess);
 
-        phong_shader.setVec3("light.pos", light_pos);
-        phong_shader.setVec3("light.ambient", light_strength.ambient);
-        phong_shader.setVec3("light.diffuse", light_strength.diffuse);
-        phong_shader.setVec3("light.specular", light_strength.specular);
+        phong_shader.setFloat("point_light.power", _light_point.Power);
+        phong_shader.setVec3("point_light.pos", glm::vec3(_light_point.Transform[3][0], _light_point.Transform[3][1], _light_point.Transform[3][2]));
+        phong_shader.setVec3("point_light.ambient", _light_point.ambient);
+        phong_shader.setVec3("point_light.diffuse", _light_point.diffuse);
+        phong_shader.setVec3("point_light.specular", _light_point.specular);
+
+        phong_shader.setFloat("dir_light.power", _light_dir.Power);
+        phong_shader.setVec3("dir_light.dir", _light_dir.GetDirection());
+        phong_shader.setVec3("dir_light.ambient", _light_dir.ambient);
+        phong_shader.setVec3("dir_light.diffuse", _light_dir.diffuse);
+        phong_shader.setVec3("dir_light.specular", _light_dir.specular);
+
+        phong_shader.setFloat("spot_light.power", _light_spot.Power);
+        phong_shader.setVec3("spot_light.pos", glm::vec3(_light_spot.Transform[3][0], _light_spot.Transform[3][1], _light_spot.Transform[3][2]));
+        phong_shader.setVec3("spot_light.dir", _light_spot.GetDirection());
+        phong_shader.setFloat("spot_light.cosR1", glm::cos(glm::radians(_light_spot.R1)));
+        phong_shader.setFloat("spot_light.cosR2", glm::cos(glm::radians(_light_spot.R2)));
+        phong_shader.setVec3("spot_light.ambient", _light_spot.ambient);
+        phong_shader.setVec3("spot_light.diffuse", _light_spot.diffuse);
+        phong_shader.setVec3("spot_light.specular", _light_spot.specular);
 
 
         phong_shader.setVec3("camera_pos", mainCamera.Position);
 
         //_model.Draw(mainCamera);
         _model.Draw(phong_shader,mainCamera);
-        _light.Draw(mainCamera);
+        _light_point.Draw(mainCamera);
+        _light_dir.Draw(mainCamera);
+        _light_spot.Draw(mainCamera);
 
 
         GUITick();

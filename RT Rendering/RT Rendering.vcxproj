@@ -430,6 +430,7 @@
     <ClInclude Include="External\include\ImGUI\imstb_truetype.h" />
     <ClInclude Include="External\include\stb_image.h" />
     <ClInclude Include="gui.h" />
+    <ClInclude Include="light.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="shader.h" />
@@ -446,6 +447,7 @@
     <ClCompile Include="External\include\ImGUI\imgui_impl_opengl3.cpp" />
     <ClCompile Include="External\include\ImGUI\imgui_tables.cpp" />
     <ClCompile Include="External\include\ImGUI\imgui_widgets.cpp" />
+    <ClCompile Include="light.cpp" />
     <ClCompile Include="mesh.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="stb_image_wrap.cpp" />
@@ -592,6 +594,8 @@
     <None Include="External\include\glm\gtx\vector_angle.inl" />
     <None Include="External\include\glm\gtx\vector_query.inl" />
     <None Include="External\include\glm\gtx\wrap.inl" />
+    <None Include="Shaders\BasicShader\lightDraw.frag" />
+    <None Include="Shaders\BasicShader\lightDraw.vert" />
     <None Include="Shaders\Gouraud.frag" />
     <None Include="Shaders\Gouraud.vert" />
     <None Include="Shaders\Phong.frag" />
