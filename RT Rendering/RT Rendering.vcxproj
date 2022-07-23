@@ -596,6 +596,8 @@
     <None Include="External\include\glm\gtx\wrap.inl" />
     <None Include="Shaders\BasicShader\lightDraw.frag" />
     <None Include="Shaders\BasicShader\lightDraw.vert" />
+    <None Include="Shaders\BlinnPhong.frag" />
+    <None Include="Shaders\BlinnPhong.vert" />
     <None Include="Shaders\Gouraud.frag" />
     <None Include="Shaders\Gouraud.vert" />
     <None Include="Shaders\Phong.frag" />

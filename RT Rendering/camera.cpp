@@ -10,7 +10,7 @@ glm::mat4 Camera::GetViewMatrix(){
 
 glm::mat4 Camera::GetProjMatrix(){
 	if (type == ORTHO) {
-		return glm::ortho(0.0f, Width, 0.0f, Height, Near, Far);
+		return glm::ortho(-Width, Width, -Height, Height, Near, Far);
 	}
 	else return glm::perspective(glm::radians(FOV), Width / Height, Near, Far);
 }
@@ -59,6 +59,13 @@ void Camera::ScaleFOV(float yoffset){
 		FOV = 1.0f;
 	if (FOV > 60.0f)
 		FOV = 60.0f;
+
+	if (type == ORTHO) {
+		Width -= Width / Height * ScaleSpeed * (float)yoffset;
+		Height -= ScaleSpeed * (float)yoffset;
+	}
+	if (Width < 1.0f * Width / Height) Width = 1.0f * Width / Height;
+	if (Height < 1.0f) Height = 1.0f;
 }
 
 void Camera::UpdateVector(){

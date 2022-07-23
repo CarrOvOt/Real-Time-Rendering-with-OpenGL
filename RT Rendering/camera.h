@@ -42,6 +42,7 @@ public:
 	float MoveSpeed = 2.0f;
 	float RoateSpeedX = 0.1f;
 	float RoateSpeedY = 0.1f;
+	float ScaleSpeed = 2.0f;
 
 
 	Camera(float height,float width);

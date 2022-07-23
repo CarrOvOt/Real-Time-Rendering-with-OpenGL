@@ -323,8 +323,6 @@ struct Light {
 
 可以看到ImGUI也经过了Gamma校正，所以整体偏亮，这个问题之后再解决。
 
-
-
 参考资料：
 
 [Gamma校正 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/05%20Advanced%20Lighting/02%20Gamma%20Correction/)
@@ -333,4 +331,18 @@ struct Light {
 
 ### ver1.1.1
 
-**TODO: Blinn-Phong Shading**
+**Blinn-Phong Shading**
+
+对Phong Shading中的镜面光进行优化
+
+<img src="MDImages/2022-07-23-03-49-54-image.png" title="" alt="" width="461">
+
+<img src="MDImages/2022-07-23-03-48-14-image.png" title="" alt="" width="461">
+
+上图为Phong Shading，下图为Blinn-Phong Shading，这个对比不是很强，没有LearnOpenGL中的例子明显。
+
+这里我们顺便修复一个相机的bug，之前我们的相机有一个Height和Width参数用来表示相机的视野，当时我们直接将窗口大小（800x600）赋值给它们，但这个大小的单位是世界坐标的单位，所以800x600的视野是几乎看不到我们的物体（1x1左右的大小），这会导致相机设置为正射投影时看不到东西（透视投影时Height和Width只用来计算长宽的比例，所以透视投影能正常显示），这里我们修改一下Height和Width的设置，让正射投影的相机也能正常显示。
+
+
+
+参考资料：[高级光照 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/05%20Advanced%20Lighting/01%20Advanced%20Lighting/)

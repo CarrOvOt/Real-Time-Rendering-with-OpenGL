@@ -1399,6 +1399,8 @@
     <None Include="Shaders\Gouraud.vert" />
     <None Include="Shaders\BasicShader\lightDraw.frag" />
     <None Include="Shaders\BasicShader\lightDraw.vert" />
+    <None Include="Shaders\BlinnPhong.frag" />
+    <None Include="Shaders\BlinnPhong.vert" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\GLFW\lib\glfw3.lib" />

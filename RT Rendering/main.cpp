@@ -39,7 +39,7 @@ float lastMouseY = SCR_HEIGHT / 2.0;
 bool firstMouse = true;
 
 // main camera
-Camera mainCamera= Camera(SCR_HEIGHT, SCR_WIDTH);
+Camera mainCamera = Camera(SCR_HEIGHT / 200.0f, SCR_WIDTH / 200.0f);
 
 // show mouse to use gui and hide mouse to use camera
 bool showMouse = true;
@@ -56,7 +56,7 @@ float trans_x = 0.0f;
 //glm::vec3 model_color = glm::vec3(0.2f, 0.5f, 0.5f);
 
 
-glm::vec3 light_point_pos = glm::vec3(0.8f, 0.4f, 1.5f);
+glm::vec3 light_point_pos = glm::vec3(0.0f, 0.65f, -3.0f);
 float light_point_power=1.0f;
 
 glm::vec3 light_dir_rot = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -104,7 +104,6 @@ void GUITick() {
             ImGui::SliderFloat("rot_z", &rot_z, -180.0f, 180.0);
             ImGui::SliderFloat("scale_xyz", &scale_xyz, 0.1f, 5.0f);
             ImGui::SliderFloat("trans_x", &trans_x, -10.0f, 10.0f);
-            //ImGui::ColorEdit3("model color", (float*)&model_color);
             
             ImGui::Spacing();
             ImGui::SliderFloat("model shininess", &model_material.shininess, 0, 1);
@@ -229,12 +228,12 @@ int main(){
     DirLight _light_dir = DirLight();
     SpotLight _light_spot = SpotLight();
 
-    Shader phong_shader = Shader("Shaders/Phong.vert", "Shaders/Phong.frag");
+    Shader phong_shader = Shader("Shaders/BlinnPhong.vert", "Shaders/BlinnPhong.frag");
+    //Shader phong_shader = Shader("Shaders/Phong.vert", "Shaders/Phong.frag");
     //mainCamera.type = CAMERATYPE::ORTHO;
 
-
     glm::mat4 floor_sp = glm::scale(glm::mat4(1.0f), glm::vec3(7.0f));
-    floor_sp = glm::rotate(glm::mat4(1.0f), glm::radians(-80.0f), glm::vec3(1.0, 0.0, 0.0)) * floor_sp;
+    floor_sp = glm::rotate(glm::mat4(1.0f), glm::radians(-60.0f), glm::vec3(1.0, 0.0, 0.0)) * floor_sp;
     floor_sp = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.3f, -2.0f)) * floor_sp;
     floor.transform = floor_sp;
 
@@ -315,7 +314,6 @@ int main(){
 
         //_model.Draw(phong_shader,mainCamera);
         floor.Draw(phong_shader, mainCamera);
-
 
         _light_point.Draw(mainCamera);
         _light_dir.Draw(mainCamera);

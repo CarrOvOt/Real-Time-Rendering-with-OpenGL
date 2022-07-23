@@ -155,11 +155,15 @@ Texture SimpleMesh::loadTexture(string file_path, TEXTURE_TYPE type){
     glGenTextures(1, &texture_id);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 
+    unsigned int color_space = GL_RGB;
+    if (type == TEXTURE_TYPE::DIFFUSE) {
+        color_space = GL_SRGB;
+    }
     if (nrChannels == 3) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, color_space, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
     }
     else if (nrChannels == 4) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, color_space, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     }
     else {
         std::cout << "Texture channel is neither 3 nor 4"<< std::endl;
