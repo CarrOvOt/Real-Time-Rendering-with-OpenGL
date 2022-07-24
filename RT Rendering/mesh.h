@@ -18,7 +18,9 @@ using namespace std;
 
 enum TEXTURE_TYPE {
 	DIFFUSE,
-	SPECULAR
+	SPECULAR,
+	NORMAL,
+	HEIGHT
 };
 
 struct Vertex {
@@ -31,6 +33,7 @@ struct Vertex {
 struct Texture {
 	unsigned int id;
 	TEXTURE_TYPE type;
+	string name;
 };
 
 

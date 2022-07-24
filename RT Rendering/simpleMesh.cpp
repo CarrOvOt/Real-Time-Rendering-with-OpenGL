@@ -175,7 +175,7 @@ Texture SimpleMesh::loadTexture(string file_path, TEXTURE_TYPE type){
     stbi_image_free(data);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    return Texture{texture_id, type};
+    return Texture{texture_id, type, file_path};
 }
 
 

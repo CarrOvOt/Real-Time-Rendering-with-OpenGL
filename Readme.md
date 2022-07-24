@@ -343,6 +343,31 @@ struct Light {
 
 这里我们顺便修复一个相机的bug，之前我们的相机有一个Height和Width参数用来表示相机的视野，当时我们直接将窗口大小（800x600）赋值给它们，但这个大小的单位是世界坐标的单位，所以800x600的视野是几乎看不到我们的物体（1x1左右的大小），这会导致相机设置为正射投影时看不到东西（透视投影时Height和Width只用来计算长宽的比例，所以透视投影能正常显示），这里我们修改一下Height和Width的设置，让正射投影的相机也能正常显示。
 
-
-
 参考资料：[高级光照 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/05%20Advanced%20Lighting/01%20Advanced%20Lighting/)
+
+### ver1.2
+
+**使用Assimp导入3D资产**
+
+代码基本是直接copy的教程的，主要就是遍历Assimp的数据结构然后转化成我们自己的Model类，没什么好说的。![](MDImages/2022-07-24-16-30-05-image.png)
+
+然后这里修复一个之前的bug，在mesh类的setupMesh函数中
+
+```cpp
+glBufferData(GL_ARRAY_BUFFER, Vertices.size() * sizeof(Vertices), &Vertices[0], GL_STATIC_DRAW);
+glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(Indices), &Indices[0], GL_STATIC_DRAW);
+```
+
+数据的大小` Vertices.size() * sizeof(Vertices)，Indices.size() * sizeof(Indices)`应修改为` Vertices.size() * sizeof(Vertex)，Indices.size() * sizeof(unsigned int)`
+
+![](MDImages/2022-07-24-16-12-10-image.png)
+
+在我们目前的环境中`sizeof(vector)`的大小是32，是`sizeof(unsigned int)`的8倍，所以当`indices.size()`比较大的时候就很容易发生内存冲突，导致gl绑定buffer时出现一些奇怪的问题。绑定顶点信息没有报错的原因如图，只是恰好顶点信息的长度是32和vector一样。
+
+
+
+参考资料：
+
+[模型 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/03%20Model%20Loading/03%20Model/#_5)
+
+[C++中sizeof(vector)的问题 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/257423774)

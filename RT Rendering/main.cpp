@@ -219,10 +219,14 @@ int main(){
     // ImGUI
     GUI::ImGUIInit(window);
 
-   
+
     // mesh & shader & camera
     Model _model = Model(SHAPE::CUBE);
     Model floor = Model(SHAPE::RECT);
+    Model nanosuit = Model();
+    nanosuit.LoadModel("./Resource/nanosuit/nanosuit.obj");
+    //nanosuit.LoadModel("C:/Users/96904/Desktop/free_hq__pbr_game_model_metallic_sapphire_dice/scene.gltf");
+
 
     PointLight _light_point = PointLight();
     DirLight _light_dir = DirLight();
@@ -257,6 +261,9 @@ int main(){
         model_sp = glm::rotate(glm::mat4(1.0f), glm::radians(rot_y), glm::vec3(0.0, 1.0, 0.0)) * model_sp;
         model_sp = glm::translate(glm::mat4(1.0f), glm::vec3(trans_x, 0.0f, 0.0f))* model_sp;
         _model.transform = model_sp;
+
+        nanosuit.transform = model_sp;
+
 
 
         _light_point.Transform = glm::translate(glm::mat4(1.0f), light_point_pos);
@@ -313,11 +320,13 @@ int main(){
         phong_shader.setVec3("camera_pos", mainCamera.Position);
 
         //_model.Draw(phong_shader,mainCamera);
-        floor.Draw(phong_shader, mainCamera);
+        //floor.Draw(phong_shader, mainCamera);
+        nanosuit.Draw(phong_shader, mainCamera);
 
         _light_point.Draw(mainCamera);
         _light_dir.Draw(mainCamera);
         _light_spot.Draw(mainCamera);
+         
 
 
         GUITick();
