@@ -51,9 +51,8 @@ glm::vec3 background_color = glm::vec3(0.0f, 0.0f, 0.0f );
 
 float rot_y = 0.0f;
 float rot_z = 0.0f;
-float scale_xyz = 1.0f;
+float scale_xyz = 0.5f;
 float trans_x = 0.0f;
-//glm::vec3 model_color = glm::vec3(0.2f, 0.5f, 0.5f);
 
 
 glm::vec3 light_point_pos = glm::vec3(0.0f, 0.65f, -3.0f);
@@ -102,7 +101,7 @@ void GUITick() {
 
             ImGui::SliderFloat("rot_y", &rot_y, -180.0f, 180.0);
             ImGui::SliderFloat("rot_z", &rot_z, -180.0f, 180.0);
-            ImGui::SliderFloat("scale_xyz", &scale_xyz, 0.1f, 5.0f);
+            ImGui::SliderFloat("scale_xyz", &scale_xyz, 0.05f, 3.0f);
             ImGui::SliderFloat("trans_x", &trans_x, -10.0f, 10.0f);
             
             ImGui::Spacing();
@@ -223,23 +222,29 @@ int main(){
     // mesh & shader & camera
     Model _model = Model(SHAPE::CUBE);
     Model floor = Model(SHAPE::RECT);
-    Model nanosuit = Model();
-    nanosuit.LoadModel("./Resource/nanosuit/nanosuit.obj");
-    //nanosuit.LoadModel("C:/Users/96904/Desktop/free_hq__pbr_game_model_metallic_sapphire_dice/scene.gltf");
-
+    Model dice = Model();
+    dice.LoadModel("C:/Users/96904/Desktop/free_hq__pbr_game_model_metallic_sapphire_dice/scene.gltf");
 
     PointLight _light_point = PointLight();
     DirLight _light_dir = DirLight();
     SpotLight _light_spot = SpotLight();
 
-    Shader phong_shader = Shader("Shaders/BlinnPhong.vert", "Shaders/BlinnPhong.frag");
-    //Shader phong_shader = Shader("Shaders/Phong.vert", "Shaders/Phong.frag");
-    //mainCamera.type = CAMERATYPE::ORTHO;
-
-    glm::mat4 floor_sp = glm::scale(glm::mat4(1.0f), glm::vec3(7.0f));
-    floor_sp = glm::rotate(glm::mat4(1.0f), glm::radians(-60.0f), glm::vec3(1.0, 0.0, 0.0)) * floor_sp;
-    floor_sp = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.3f, -2.0f)) * floor_sp;
+    glm::mat4 floor_sp = glm::scale(glm::mat4(1.0f), glm::vec3(50.0f));
+    floor_sp = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0)) * floor_sp;
+    floor_sp = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -1.0f, -20.0f)) * floor_sp;
     floor.transform = floor_sp;
+
+
+    Shader phong_shader = Shader("Shaders/BlinnPhong.vert", "Shaders/BlinnPhong.frag");
+    Shader depth_shader = Shader("Shaders/DebugShader/depth.vert", "Shaders/DebugShader/depth.frag");
+    //Shader phong_shader = Shader("Shaders/Phong.vert", "Shaders/Phong.frag");
+
+
+    mainCamera.Move(CAMERAMOVE::WDUP, 1.0f);
+    mainCamera.Move(CAMERAMOVE::BACKWARD, 2.0f);
+    mainCamera.Roate(0, 100.0f);
+    mainCamera.Far = 50.0f;
+    //mainCamera.type = CAMERATYPE::ORTHO;
 
 
     // GL settings
@@ -262,7 +267,7 @@ int main(){
         model_sp = glm::translate(glm::mat4(1.0f), glm::vec3(trans_x, 0.0f, 0.0f))* model_sp;
         _model.transform = model_sp;
 
-        nanosuit.transform = model_sp;
+        dice.transform = model_sp;
 
 
 
@@ -316,16 +321,23 @@ int main(){
         phong_shader.setVec3("spot_light.diffuse", _light_spot.diffuse);
         phong_shader.setVec3("spot_light.specular", _light_spot.specular);
 
-
         phong_shader.setVec3("camera_pos", mainCamera.Position);
 
-        //_model.Draw(phong_shader,mainCamera);
-        //floor.Draw(phong_shader, mainCamera);
-        nanosuit.Draw(phong_shader, mainCamera);
+        glDisable(GL_FRAMEBUFFER_SRGB);
+        depth_shader.use();
+        depth_shader.setFloat("far", mainCamera.Far);
+        depth_shader.setFloat("near", mainCamera.Near);
+        //_model.Draw(depth_shader,mainCamera);
+        floor.Draw(depth_shader, mainCamera);
+        dice.Draw(depth_shader, mainCamera);
 
-        _light_point.Draw(mainCamera);
-        _light_dir.Draw(mainCamera);
-        _light_spot.Draw(mainCamera);
+        ////_model.Draw(phong_shader,mainCamera);
+        //floor.Draw(phong_shader, mainCamera);
+        //dice.Draw(phong_shader, mainCamera);
+
+        //_light_point.Draw(mainCamera);
+        //_light_dir.Draw(mainCamera);
+        //_light_spot.Draw(mainCamera);
          
 
 

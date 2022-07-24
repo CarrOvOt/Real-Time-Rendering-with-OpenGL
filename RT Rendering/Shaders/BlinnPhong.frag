@@ -19,7 +19,6 @@ struct Light{
     vec3 specular;
 };
 
-in vec3 VertColor;
 in vec3 VertPos;
 in vec3 VertNormal;
 in vec2 VertTexCoord;

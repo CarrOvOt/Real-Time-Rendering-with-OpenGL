@@ -689,6 +689,8 @@
     <None Include="Shaders\BasicShader\lightDraw.vert" />
     <None Include="Shaders\BlinnPhong.frag" />
     <None Include="Shaders\BlinnPhong.vert" />
+    <None Include="Shaders\DebugShader\depth.frag" />
+    <None Include="Shaders\DebugShader\depth.vert" />
     <None Include="Shaders\Gouraud.frag" />
     <None Include="Shaders\Gouraud.vert" />
     <None Include="Shaders\Phong.frag" />

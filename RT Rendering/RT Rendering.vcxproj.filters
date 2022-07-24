@@ -1672,6 +1672,8 @@
       <Filter>头文件</Filter>
     </None>
     <None Include="External\Assimp\lib\assimp-vc143-mtd.dll" />
+    <None Include="Shaders\DebugShader\depth.vert" />
+    <None Include="Shaders\DebugShader\depth.frag" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\GLFW\lib\glfw3.lib" />

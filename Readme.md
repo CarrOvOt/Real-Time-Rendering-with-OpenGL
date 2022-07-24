@@ -364,10 +364,22 @@ glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(Indices), &Indices
 
 在我们目前的环境中`sizeof(vector)`的大小是32，是`sizeof(unsigned int)`的8倍，所以当`indices.size()`比较大的时候就很容易发生内存冲突，导致gl绑定buffer时出现一些奇怪的问题。绑定顶点信息没有报错的原因如图，只是恰好顶点信息的长度是32和vector一样。
 
-
-
 参考资料：
 
 [模型 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/03%20Model%20Loading/03%20Model/#_5)
 
 [C++中sizeof(vector)的问题 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/257423774)
+
+### ver1.3
+
+**深度缓冲**
+
+类似于Gamma校正（近的位置深度敏感，深度信息存储精度有限），在可视化深度之前要把深度缓冲中的值映射到线性空间。
+
+> 重要的是要记住深度缓冲中的值在屏幕空间中不是线性的（在透视矩阵应用之前在观察空间中是线性的）
+
+![](MDImages/2022-07-24-22-21-25-image.png)
+
+（为了效果比较明显，这张图的相机的Far平面设置成了5.0，Near平面为0.1）
+
+参考资料：[深度测试 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/01%20Depth%20testing/#_1)
