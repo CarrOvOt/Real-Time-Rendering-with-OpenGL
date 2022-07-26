@@ -66,15 +66,8 @@ glm::vec3 light_spot_rot = glm::vec3(-45.0f, 0.0f, 0.0f);
 float light_spot_power = 1.0f;
 
 
-struct Material {
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-    float shininess;
-};
+float shininess= 0.25f;
 
-
-Material model_material{ glm::vec3(1.0f,1.0f,1.0f),glm::vec3(1.0f,1.0f,1.0f), glm::vec3(1.0f,1.0f,1.0f), 0.25f};
 
 // rendering gui window
 void GUITick() {
@@ -105,7 +98,7 @@ void GUITick() {
             ImGui::SliderFloat("trans_x", &trans_x, -10.0f, 10.0f);
             
             ImGui::Spacing();
-            ImGui::SliderFloat("model shininess", &model_material.shininess, 0, 1);
+            ImGui::SliderFloat("model shininess", &shininess, 0, 1);
         }
         ImGui::Spacing();
 
@@ -219,15 +212,15 @@ int main(){
     GUI::ImGUIInit(window);
 
 
-    // mesh & shader & camera
-    Model _model = Model(SHAPE::CUBE);
+    // models
     Model floor = Model(SHAPE::RECT);
-    Model dice = Model();
-    dice.LoadModel("C:/Users/96904/Desktop/free_hq__pbr_game_model_metallic_sapphire_dice/scene.gltf");
+    Model main_model = Model();
+    //main_model.LoadModel("Resource/dice/scene.gltf");
+    main_model.LoadModel("Resource/hk_ump/scene.gltf");
+    //main_model.LoadModel("Resource/higokumaru/scene.gltf");
+    //main_model.LoadModel("Resource/pickaxe/scene.gltf");
 
-    PointLight _light_point = PointLight();
-    DirLight _light_dir = DirLight();
-    SpotLight _light_spot = SpotLight();
+
 
     glm::mat4 floor_sp = glm::scale(glm::mat4(1.0f), glm::vec3(50.0f));
     floor_sp = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0, 0.0, 0.0)) * floor_sp;
@@ -235,11 +228,20 @@ int main(){
     floor.transform = floor_sp;
 
 
+    // lights
+    PointLight _light_point = PointLight();
+    DirLight _light_dir = DirLight();
+    SpotLight _light_spot = SpotLight();
+
+
+
+    // shaders    
     Shader phong_shader = Shader("Shaders/BlinnPhong.vert", "Shaders/BlinnPhong.frag");
     Shader depth_shader = Shader("Shaders/DebugShader/depth.vert", "Shaders/DebugShader/depth.frag");
-    //Shader phong_shader = Shader("Shaders/Phong.vert", "Shaders/Phong.frag");
+    Shader outline_shader = Shader("Shaders/Effect/outlining.vert", "Shaders/Effect/outlining.frag");
 
 
+    // cameras
     mainCamera.Move(CAMERAMOVE::WDUP, 1.0f);
     mainCamera.Move(CAMERAMOVE::BACKWARD, 2.0f);
     mainCamera.Roate(0, 100.0f);
@@ -250,6 +252,8 @@ int main(){
     // GL settings
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_FRAMEBUFFER_SRGB);
+
+    glEnable(GL_STENCIL_TEST);
 
     // rendering loop
     while (!glfwWindowShouldClose(window)){
@@ -265,9 +269,8 @@ int main(){
         model_sp = glm::rotate(glm::mat4(1.0f), glm::radians(rot_z), glm::vec3(0.0, 0.0, 1.0)) * model_sp;
         model_sp = glm::rotate(glm::mat4(1.0f), glm::radians(rot_y), glm::vec3(0.0, 1.0, 0.0)) * model_sp;
         model_sp = glm::translate(glm::mat4(1.0f), glm::vec3(trans_x, 0.0f, 0.0f))* model_sp;
-        _model.transform = model_sp;
 
-        dice.transform = model_sp;
+        main_model.transform = model_sp;
 
 
 
@@ -291,14 +294,14 @@ int main(){
 
         
         glClearColor(background_color.x, background_color.y, background_color.z, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         if (use_wireframe_mode) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         phong_shader.use();
 
-        phong_shader.setFloat("material.shininess", model_material.shininess);
+        phong_shader.setFloat("shininess", shininess);
 
         phong_shader.setFloat("point_light.power", _light_point.Power);
         phong_shader.setVec3("point_light.pos", glm::vec3(_light_point.Transform[3][0], _light_point.Transform[3][1], _light_point.Transform[3][2]));
@@ -323,21 +326,41 @@ int main(){
 
         phong_shader.setVec3("camera_pos", mainCamera.Position);
 
-        glDisable(GL_FRAMEBUFFER_SRGB);
-        depth_shader.use();
-        depth_shader.setFloat("far", mainCamera.Far);
-        depth_shader.setFloat("near", mainCamera.Near);
-        //_model.Draw(depth_shader,mainCamera);
-        floor.Draw(depth_shader, mainCamera);
-        dice.Draw(depth_shader, mainCamera);
+        //glDisable(GL_FRAMEBUFFER_SRGB);
+        //depth_shader.use();
+        //depth_shader.setFloat("far", mainCamera.Far);
+        //depth_shader.setFloat("near", mainCamera.Near);
+        //floor.Draw(depth_shader, mainCamera);
+        //dice.Draw(depth_shader, mainCamera);
 
-        ////_model.Draw(phong_shader,mainCamera);
+
+        outline_shader.use();
+        outline_shader.setFloat("line_width", 0.02f);
+        outline_shader.setVec3("outline_color", glm::vec3(0.7f,1.0f,0.7f));
+
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+        glStencilMask(0x00);
         //floor.Draw(phong_shader, mainCamera);
-        //dice.Draw(phong_shader, mainCamera);
 
         //_light_point.Draw(mainCamera);
         //_light_dir.Draw(mainCamera);
         //_light_spot.Draw(mainCamera);
+
+
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
+
+        main_model.Draw(phong_shader, mainCamera);
+
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        glStencilMask(0x00);
+        glDisable(GL_DEPTH_TEST);
+
+        main_model.Draw(outline_shader, mainCamera);
+
+        glStencilMask(0xFF); // this will affect glClear
+        glEnable(GL_DEPTH_TEST);
          
 
 

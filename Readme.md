@@ -383,3 +383,27 @@ glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(Indices), &Indices
 （为了效果比较明显，这张图的相机的Far平面设置成了5.0，Near平面为0.1）
 
 参考资料：[深度测试 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/01%20Depth%20testing/#_1)
+
+模型资源：[DICE - Download Free 3D model by SHARK FIN (@mo7amed85)](https://sketchfab.com/3d-models/free-hq-pbr-game-model-metallic-sapphire-dice-f4e12f278ea74f648eeaaaec245a4a44)
+
+### ver1.4
+
+**模板测试 - 模型描边**
+
+这里将描边的方式简单修改一下：将模型的顶点沿法线方向移动一段距离。（单纯的缩放再复杂物体上的表现会比较差）
+
+部分片面（因为纹理和法线而拆点的地方）沿法线移动后就会分离，这时候如果相机离得比较近而且描边宽度较大就会看到缺陷。
+
+<img src="MDImages/2022-07-26-22-57-51-image.png" title="" alt="" width="477">
+
+参考资料：
+
+[模板测试 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/02%20Stencil%20testing/)
+
+[glStencilFunc function (Gl.h) - Win32 apps | Microsoft Docs](https://docs.microsoft.com/en-us/windows/win32/opengl/glstencilfunc?redirectedfrom=MSDN)
+
+[glStencilOp function (Gl.h) - Win32 apps | Microsoft Docs](https://docs.microsoft.com/en-us/windows/win32/opengl/glstencilop?redirectedfrom=MSDN)
+
+模型资源：
+
+[HK UMP - Lowpoly - Download Free 3D model by Enzo Amanrich (@ImaGeniusMan)](https://sketchfab.com/3d-models/hk-ump-lowpoly-77edc85265d4486d928fcb21c5175b10)

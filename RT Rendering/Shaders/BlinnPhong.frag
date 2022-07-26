@@ -1,11 +1,7 @@
 #version 330 core
 
-struct Material {
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    float shininess;
-}; 
+
+
 
 struct Light{
     vec3 pos;   // used for point light and spot light
@@ -26,7 +22,7 @@ in vec2 VertTexCoord;
 
 out vec4 FragColor;
 
-uniform Material material;
+uniform float shininess;
 
 uniform Light point_light;
 uniform Light dir_light;
@@ -52,7 +48,7 @@ vec3 CalcDirLight(Light light, vec3 norm,vec3 view_dir){
     float diff = max(dot(norm, light_dir), 0.0);
     vec3 diffuse  = light.diffuse  * diff * texture(texture_diffuse1, VertTexCoord).rgb;
     // specular
-    float spec = pow(max(dot(norm, halfway_dir), 0.0), 128 * material.shininess);
+    float spec = pow(max(dot(norm, halfway_dir), 0.0), 128 * shininess);
     vec3 specular = light.specular * spec * texture(texture_diffuse1, VertTexCoord).rgb;
 
     return (ambient + diffuse + specular) * light.power;
@@ -72,7 +68,7 @@ vec3 CalcPointLight(Light light, vec3 norm,vec3 view_dir){
     float diff = max(dot(norm, light_dir), 0.0);
     vec3 diffuse = diff * light.diffuse * texture(texture_diffuse1,VertTexCoord).rgb;
     // specular
-    float spec = pow(max(dot(norm, halfway_dir), 0.0), 128 * material.shininess);
+    float spec = pow(max(dot(norm, halfway_dir), 0.0), 128 * shininess);
     vec3 specular = spec * light.specular * texture(texture_specular1,VertTexCoord).rgb;
 
     return (ambient + diffuse + specular)* light_strength;
@@ -96,7 +92,7 @@ vec3 CalcSpotLight(Light light, vec3 norm,vec3 view_dir){
     float diff = max(dot(norm, light_dir), 0.0);
     vec3 diffuse = diff * light.diffuse * texture(texture_diffuse1,VertTexCoord).rgb;
     // specular
-    float spec = pow(max(dot(norm, halfway_dir), 0.0), 128 * material.shininess);
+    float spec = pow(max(dot(norm, halfway_dir), 0.0), 128 * shininess);
     vec3 specular = spec * light.specular * texture(texture_specular1,VertTexCoord).rgb;
 
     return (ambient + diffuse * intensity + specular * intensity)* light_strength;
@@ -115,4 +111,5 @@ void main(){
 
     FragColor = vec4(light_all, 1.0f);
 
+    FragColor =vec4(texture(texture_diffuse1,VertTexCoord).rgb,1.0f);
 }
