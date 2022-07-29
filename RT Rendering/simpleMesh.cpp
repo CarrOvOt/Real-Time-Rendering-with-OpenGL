@@ -69,12 +69,13 @@ static unsigned int CubeIndic[] = {
     30,31,32,  33,34,35,
 };
 
+// DO NOT modify this numbers because screen buffer is shown by a Rect SimpleMesh
 static float RectVert[] = {
     // position                 // normal           // texture coordinate  
-    0.5f,   0.5f,   0.0f,       0.0f,0.0f,1.0f,     0.5f,   0.5f,
-    -0.5f,  0.5f,   0.0f,       0.0f,0.0f,1.0f,     -0.5f,  0.5f,
-    -0.5f,  -0.5f,  0.0f,       0.0f,0.0f,1.0f,     -0.5f,  -0.5f,
-    0.5f,   -0.5f,  0.0f,       0.0f,0.0f,1.0f,     0.5f,   -0.5f,
+    1.0f,   1.0f,   0.0f,       0.0f,0.0f,1.0f,     1.0f,   1.0f,
+    -1.0f,  1.0f,   0.0f,       0.0f,0.0f,1.0f,     0.0f,  1.0f,
+    -1.0f,  -1.0f,  0.0f,       0.0f,0.0f,1.0f,     0.0f,  0.0f,
+    1.0f,   -1.0f,  0.0f,       0.0f,0.0f,1.0f,     1.0f,   0.0f,
 };
 
 static unsigned int RectIndic[] = {
@@ -141,6 +142,10 @@ SimpleMesh::SimpleMesh(SHAPE shape){
 
     setupMesh();
 
+}
+
+void SimpleMesh::RemoveTextures(){
+    this->Textures.clear();
 }
 
 

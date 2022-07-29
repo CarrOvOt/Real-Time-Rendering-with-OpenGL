@@ -1676,6 +1676,10 @@
     <None Include="Shaders\DebugShader\depth.frag" />
     <None Include="Shaders\Effect\outlining.frag" />
     <None Include="Shaders\Effect\outlining.vert" />
+    <None Include="Shaders\Postprocess\default.vert" />
+    <None Include="Shaders\Postprocess\default.frag" />
+    <None Include="Shaders\Postprocess\kernal.frag" />
+    <None Include="Shaders\Postprocess\kernal.vert" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\GLFW\lib\glfw3.lib" />

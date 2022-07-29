@@ -407,3 +407,21 @@ glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(Indices), &Indices
 模型资源：
 
 [HK UMP - Lowpoly - Download Free 3D model by Enzo Amanrich (@ImaGeniusMan)](https://sketchfab.com/3d-models/hk-ump-lowpoly-77edc85265d4486d928fcb21c5175b10)
+
+### ver1.5
+
+**帧缓冲**
+
+面剔除：`glEnable(GL_CULL_FACE);`
+
+这里我们依次渲染了原始图像，渲染了平面四边形，渲染了GUI，需要注意Gamma校正（sRGB的开启和关闭）。
+
+<img title="" src="MDImages/2022-07-29-21-34-23-image.png" alt="" width="465"><img title="" src="MDImages/2022-07-29-21-36-05-image.png" alt="" width="463">
+
+上：正常；下：边缘检测
+
+
+
+参考资料：[帧缓冲 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/05%20Framebuffers/#_9)
+
+模型资源：[Higokumaru | Honkai Impact 3rd - Download Free 3D model by MooKorea ](https://sketchfab.com/3d-models/higokumaru-honkai-impact-3rd-0e903387170846f5939adaa0c277b91b)

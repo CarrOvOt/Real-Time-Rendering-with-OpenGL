@@ -26,6 +26,8 @@ public:
 	SimpleMesh();
 	SimpleMesh(SHAPE shape);
 
+	void RemoveTextures();
+
 
 private:
 

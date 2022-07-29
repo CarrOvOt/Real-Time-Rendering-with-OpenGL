@@ -49,8 +49,7 @@ bool use_wireframe_mode = false;
 
 glm::vec3 background_color = glm::vec3(0.0f, 0.0f, 0.0f );
 
-float rot_y = 0.0f;
-float rot_z = 0.0f;
+glm::vec3 rot_xyz = glm::vec3(-90.0f, 0.0f, 0.0f);
 float scale_xyz = 0.5f;
 float trans_x = 0.0f;
 
@@ -92,8 +91,7 @@ void GUITick() {
 
         if (ImGui::CollapsingHeader("Model Setting")) {
 
-            ImGui::SliderFloat("rot_y", &rot_y, -180.0f, 180.0);
-            ImGui::SliderFloat("rot_z", &rot_z, -180.0f, 180.0);
+            ImGui::SliderFloat3("rot_y", (float*)&rot_xyz, -180.0f, 180.0);
             ImGui::SliderFloat("scale_xyz", &scale_xyz, 0.05f, 3.0f);
             ImGui::SliderFloat("trans_x", &trans_x, -10.0f, 10.0f);
             
@@ -183,7 +181,7 @@ int main(){
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    //glfwWindowHint(GLFW_RESIZABLE, false);// fix window size
+    glfwWindowHint(GLFW_RESIZABLE, false);// fix window size
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 
@@ -216,8 +214,8 @@ int main(){
     Model floor = Model(SHAPE::RECT);
     Model main_model = Model();
     //main_model.LoadModel("Resource/dice/scene.gltf");
-    main_model.LoadModel("Resource/hk_ump/scene.gltf");
-    //main_model.LoadModel("Resource/higokumaru/scene.gltf");
+    //main_model.LoadModel("Resource/hk_ump/scene.gltf");
+    main_model.LoadModel("Resource/higokumaru/scene.gltf");
     //main_model.LoadModel("Resource/pickaxe/scene.gltf");
 
 
@@ -249,11 +247,48 @@ int main(){
     //mainCamera.type = CAMERATYPE::ORTHO;
 
 
-    // GL settings
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_FRAMEBUFFER_SRGB);
 
-    glEnable(GL_STENCIL_TEST);
+    // screen buffer
+    unsigned int screenBuffer;
+    glGenFramebuffers(1, &screenBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, screenBuffer);
+
+    // screen texture
+    unsigned int screenTexture;
+    glGenTextures(1, &screenTexture);
+    glBindTexture(GL_TEXTURE_2D, screenTexture);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // bind screen texture to screen buffer
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
+
+
+    // use Renderbuffer Object to get depth and stencil
+    unsigned int rbo;
+    glGenRenderbuffers(1, &rbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    // bind the Renderbuffer Object to screen buffer
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+    // check
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+    // screen mesh and shader
+    SimpleMesh screen_mesh = SimpleMesh(SHAPE::RECT);
+    screen_mesh.RemoveTextures();
+    Shader screen_shader = Shader("Shaders/Postprocess/default.vert", "Shaders/Postprocess/default.frag");
+    //Shader screen_shader = Shader("Shaders/Postprocess/kernal.vert", "Shaders/Postprocess/kernal.frag");
+
+
 
     // rendering loop
     while (!glfwWindowShouldClose(window)){
@@ -266,8 +301,9 @@ int main(){
         processInput(window);
 
         glm::mat4 model_sp = glm::scale(glm::mat4(1.0f), glm::vec3(scale_xyz, scale_xyz, scale_xyz));
-        model_sp = glm::rotate(glm::mat4(1.0f), glm::radians(rot_z), glm::vec3(0.0, 0.0, 1.0)) * model_sp;
-        model_sp = glm::rotate(glm::mat4(1.0f), glm::radians(rot_y), glm::vec3(0.0, 1.0, 0.0)) * model_sp;
+        model_sp = glm::rotate(glm::mat4(1.0f), glm::radians(rot_xyz.z), glm::vec3(0.0, 0.0, 1.0)) * model_sp;
+        model_sp = glm::rotate(glm::mat4(1.0f), glm::radians(rot_xyz.y), glm::vec3(0.0, 1.0, 0.0)) * model_sp;
+        model_sp = glm::rotate(glm::mat4(1.0f), glm::radians(rot_xyz.x), glm::vec3(1.0, 0.0, 0.0)) * model_sp;
         model_sp = glm::translate(glm::mat4(1.0f), glm::vec3(trans_x, 0.0f, 0.0f))* model_sp;
 
         main_model.transform = model_sp;
@@ -293,78 +329,110 @@ int main(){
         _light_spot.Power = light_spot_power;
 
         
-        glClearColor(background_color.x, background_color.y, background_color.z, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        // first pass
+        {
 
-        if (use_wireframe_mode) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            glEnable(GL_DEPTH_TEST);
+            //glEnable(GL_FRAMEBUFFER_SRGB);
+            glEnable(GL_STENCIL_TEST);
+            glEnable(GL_CULL_FACE);
 
-        phong_shader.use();
+            glBindFramebuffer(GL_FRAMEBUFFER, screenBuffer);
 
-        phong_shader.setFloat("shininess", shininess);
+            glClearColor(background_color.x, background_color.y, background_color.z, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        phong_shader.setFloat("point_light.power", _light_point.Power);
-        phong_shader.setVec3("point_light.pos", glm::vec3(_light_point.Transform[3][0], _light_point.Transform[3][1], _light_point.Transform[3][2]));
-        phong_shader.setVec3("point_light.ambient", _light_point.ambient);
-        phong_shader.setVec3("point_light.diffuse", _light_point.diffuse);
-        phong_shader.setVec3("point_light.specular", _light_point.specular);
+            if (use_wireframe_mode) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-        phong_shader.setFloat("dir_light.power", _light_dir.Power);
-        phong_shader.setVec3("dir_light.dir", _light_dir.GetDirection());
-        phong_shader.setVec3("dir_light.ambient", _light_dir.ambient);
-        phong_shader.setVec3("dir_light.diffuse", _light_dir.diffuse);
-        phong_shader.setVec3("dir_light.specular", _light_dir.specular);
+            phong_shader.use();
 
-        phong_shader.setFloat("spot_light.power", _light_spot.Power);
-        phong_shader.setVec3("spot_light.pos", glm::vec3(_light_spot.Transform[3][0], _light_spot.Transform[3][1], _light_spot.Transform[3][2]));
-        phong_shader.setVec3("spot_light.dir", _light_spot.GetDirection());
-        phong_shader.setFloat("spot_light.cosR1", glm::cos(glm::radians(_light_spot.R1)));
-        phong_shader.setFloat("spot_light.cosR2", glm::cos(glm::radians(_light_spot.R2)));
-        phong_shader.setVec3("spot_light.ambient", _light_spot.ambient);
-        phong_shader.setVec3("spot_light.diffuse", _light_spot.diffuse);
-        phong_shader.setVec3("spot_light.specular", _light_spot.specular);
+            phong_shader.setFloat("shininess", shininess);
 
-        phong_shader.setVec3("camera_pos", mainCamera.Position);
+            phong_shader.setFloat("point_light.power", _light_point.Power);
+            phong_shader.setVec3("point_light.pos", glm::vec3(_light_point.Transform[3][0], _light_point.Transform[3][1], _light_point.Transform[3][2]));
+            phong_shader.setVec3("point_light.ambient", _light_point.ambient);
+            phong_shader.setVec3("point_light.diffuse", _light_point.diffuse);
+            phong_shader.setVec3("point_light.specular", _light_point.specular);
 
-        //glDisable(GL_FRAMEBUFFER_SRGB);
-        //depth_shader.use();
-        //depth_shader.setFloat("far", mainCamera.Far);
-        //depth_shader.setFloat("near", mainCamera.Near);
-        //floor.Draw(depth_shader, mainCamera);
-        //dice.Draw(depth_shader, mainCamera);
+            phong_shader.setFloat("dir_light.power", _light_dir.Power);
+            phong_shader.setVec3("dir_light.dir", _light_dir.GetDirection());
+            phong_shader.setVec3("dir_light.ambient", _light_dir.ambient);
+            phong_shader.setVec3("dir_light.diffuse", _light_dir.diffuse);
+            phong_shader.setVec3("dir_light.specular", _light_dir.specular);
 
+            phong_shader.setFloat("spot_light.power", _light_spot.Power);
+            phong_shader.setVec3("spot_light.pos", glm::vec3(_light_spot.Transform[3][0], _light_spot.Transform[3][1], _light_spot.Transform[3][2]));
+            phong_shader.setVec3("spot_light.dir", _light_spot.GetDirection());
+            phong_shader.setFloat("spot_light.cosR1", glm::cos(glm::radians(_light_spot.R1)));
+            phong_shader.setFloat("spot_light.cosR2", glm::cos(glm::radians(_light_spot.R2)));
+            phong_shader.setVec3("spot_light.ambient", _light_spot.ambient);
+            phong_shader.setVec3("spot_light.diffuse", _light_spot.diffuse);
+            phong_shader.setVec3("spot_light.specular", _light_spot.specular);
 
-        outline_shader.use();
-        outline_shader.setFloat("line_width", 0.02f);
-        outline_shader.setVec3("outline_color", glm::vec3(0.7f,1.0f,0.7f));
+            phong_shader.setVec3("camera_pos", mainCamera.Position);
 
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
-        glStencilMask(0x00);
-        //floor.Draw(phong_shader, mainCamera);
-
-        //_light_point.Draw(mainCamera);
-        //_light_dir.Draw(mainCamera);
-        //_light_spot.Draw(mainCamera);
+            //glDisable(GL_FRAMEBUFFER_SRGB);
+            //depth_shader.use();
+            //depth_shader.setFloat("far", mainCamera.Far);
+            //depth_shader.setFloat("near", mainCamera.Near);
+            //floor.Draw(depth_shader, mainCamera);
+            //dice.Draw(depth_shader, mainCamera);
 
 
-        glStencilFunc(GL_ALWAYS, 1, 0xFF);
-        glStencilMask(0xFF);
+            outline_shader.use();
+            outline_shader.setFloat("line_width", 0.02f);
+            outline_shader.setVec3("outline_color", glm::vec3(0.7f, 1.0f, 0.7f));
 
-        main_model.Draw(phong_shader, mainCamera);
+            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+            glStencilMask(0x00);
 
-        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-        glStencilMask(0x00);
-        glDisable(GL_DEPTH_TEST);
+            //floor.Draw(phong_shader, mainCamera);
 
-        main_model.Draw(outline_shader, mainCamera);
+            //_light_point.Draw(mainCamera);
+            //_light_dir.Draw(mainCamera);
+            //_light_spot.Draw(mainCamera);
 
-        glStencilMask(0xFF); // this will affect glClear
-        glEnable(GL_DEPTH_TEST);
+
+            glStencilFunc(GL_ALWAYS, 1, 0xFF);
+            glStencilMask(0xFF);
+
+            main_model.Draw(phong_shader, mainCamera);
+
+            // draw outline
+            //{
+            //    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+            //    glStencilMask(0x00);
+            //    glDisable(GL_DEPTH_TEST);
+
+            //    main_model.Draw(outline_shader, mainCamera);
+
+            //    glStencilMask(0xFF); // this will affect glClear
+            //    glEnable(GL_DEPTH_TEST);
+            //}
+        }
          
+        // second pass
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glEnable(GL_FRAMEBUFFER_SRGB);
+            glDisable(GL_DEPTH_TEST);
+            
+            //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+            screen_shader.use();
+            glBindTexture(GL_TEXTURE_2D, screenTexture);
+            screen_mesh.Draw(screen_shader);
+        }
 
-        GUITick();
+        // GUI
+        {
+            glDisable(GL_FRAMEBUFFER_SRGB);
+            GUITick();
+        }
+
 
         glfwSwapBuffers(window);
         glfwPollEvents();

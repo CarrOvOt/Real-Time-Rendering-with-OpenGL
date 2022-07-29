@@ -46,6 +46,15 @@ void Mesh::Draw(Shader& shader, Camera& camera, glm::mat4 parent_trans){
 
 }
 
+void Mesh::Draw(Shader& shader){
+    shader.use();
+
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(Indices.size()), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+
+}
+
 void Mesh::setupMesh(){
 
     //init VBO,VAO,EBO
