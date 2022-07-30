@@ -447,3 +447,23 @@ Shader程序中只能读取不能修改uniform变量，所以我们在顶点着�
 参考资料：[法线贴图 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/05%20Advanced%20Lighting/04%20Normal%20Mapping/)
 
 模型资源：[HK UMP - Lowpoly - Download Free 3D model by Enzo Amanrich (@ImaGeniusMan)](https://sketchfab.com/3d-models/hk-ump-lowpoly-77edc85265d4486d928fcb21c5175b10)
+
+
+
+### ver1.7
+
+**抗锯齿/反走样 Anti-aliasing**
+
+离屏MSAA：
+
+在之前的离屏渲染的基础上再加上一个（多采样）缓冲帧，如果不使用MSAA，这个缓冲帧无作用；如果使用MSAA，那么先将场景渲染到这个（多采样）缓冲帧中，然后用`glBlitFramebuffer`将这个（多采样）缓冲帧还原/Resolve到原来的屏幕缓冲帧中，剩下的保持一致。
+
+<img src="MDImages/2022-07-30-21-33-37-image.png" title="" alt="" width="455"><img src="MDImages/2022-07-30-21-33-45-image.png" title="" alt="" width="456">
+
+上：MSAA on； 下：MSAA off
+
+我们之前的描边宽度非常小，所以锯齿非常严重，开启MSAA后会缓解很多。
+
+参考资料：[抗锯齿 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/11%20Anti%20Aliasing/#openglmsaa)
+
+模型资源：[HK UMP - Lowpoly - Download Free 3D model by Enzo Amanrich (@ImaGeniusMan)](https://sketchfab.com/3d-models/hk-ump-lowpoly-77edc85265d4486d928fcb21c5175b10)

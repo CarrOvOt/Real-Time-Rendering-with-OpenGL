@@ -49,8 +49,8 @@ bool use_wireframe_mode = false;
 
 glm::vec3 background_color = glm::vec3(0.0f, 0.0f, 0.0f );
 
-glm::vec3 rot_xyz = glm::vec3(-90.0f, 0.0f, 0.0f);
-float scale_xyz = 0.5f;
+glm::vec3 rot_xyz = glm::vec3(-90.0f, 90.0f, 90.0f);
+float scale_xyz = 1.0f;
 float trans_x = 0.0f;
 
 
@@ -66,6 +66,11 @@ float light_spot_power = 1.0f;
 
 
 float shininess= 0.25f;
+
+bool draw_outline = false;
+
+bool use_MSAA = true;
+unsigned int msaa_samples = 4;
 
 
 // rendering gui window
@@ -86,6 +91,8 @@ void GUITick() {
 
             ImGui::ColorEdit3("background color", (float*)&background_color); // Edit 3 floats representing a color
             ImGui::Checkbox("Wireframe Mode", &use_wireframe_mode);
+            ImGui::Checkbox("MSAA", &use_MSAA);
+            ImGui::Checkbox("Outline", &draw_outline);
         }
         ImGui::Spacing();
 
@@ -263,7 +270,6 @@ int main(){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
-
     // bind screen texture to screen buffer
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
 
@@ -279,8 +285,35 @@ int main(){
 
     // check
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+        std::cout << "ERROR::FRAMEBUFFER:: Screen Framebuffer is not complete!" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+
+    // MS buffer/texture for MSAA
+    unsigned int msBuffer;
+    glGenFramebuffers(1, &msBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, msBuffer);
+
+    unsigned int msTexture;
+    glGenTextures(1, &msTexture);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, msTexture);
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, msaa_samples, GL_RGB, SCR_WIDTH, SCR_HEIGHT, GL_TRUE);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, msTexture, 0);
+
+    unsigned int msRBO;
+    glGenRenderbuffers(1, &msRBO);
+    glBindRenderbuffer(GL_RENDERBUFFER, msRBO);
+    glRenderbufferStorageMultisample(GL_RENDERBUFFER,msaa_samples, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, msRBO);
+
+    // check
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "ERROR::FRAMEBUFFER:: MS Framebuffer is not complete!" << std::endl;
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 
 
     // screen mesh and shader
@@ -332,13 +365,18 @@ int main(){
         
         // first pass
         {
+            if (use_MSAA) {
+                glBindFramebuffer(GL_FRAMEBUFFER, msBuffer);
+            }
+            else {
+                glBindFramebuffer(GL_FRAMEBUFFER, screenBuffer);
+            }
+            
 
             glEnable(GL_DEPTH_TEST);
             //glEnable(GL_FRAMEBUFFER_SRGB);
             glEnable(GL_STENCIL_TEST);
             glEnable(GL_CULL_FACE);
-
-            glBindFramebuffer(GL_FRAMEBUFFER, screenBuffer);
 
             glClearColor(background_color.x, background_color.y, background_color.z, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -400,19 +438,27 @@ int main(){
 
             main_model.Draw(phong_shader, mainCamera);
 
-            // draw outline
-            //{
-            //    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-            //    glStencilMask(0x00);
-            //    glDisable(GL_DEPTH_TEST);
+            if(draw_outline){
+                // draw outline
+                glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+                glStencilMask(0x00);
+                glDisable(GL_DEPTH_TEST);
 
-            //    main_model.Draw(outline_shader, mainCamera);
+                main_model.Draw(outline_shader, mainCamera);
 
-            //    glStencilMask(0xFF); // this will affect glClear
-            //    glEnable(GL_DEPTH_TEST);
-            //}
+                glStencilMask(0xFF); // this will affect glClear
+                glEnable(GL_DEPTH_TEST);
+            }
         }
          
+        if (use_MSAA) {
+            // MS buffer to screen buffer
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, msBuffer);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, screenBuffer);
+            glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        }
+
+
         // second pass
         {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
