@@ -15,7 +15,7 @@ struct Light{
     vec3 specular;
 };
 
-in vec3 VertPos;
+in vec3 VertPos_tagent;
 in vec3 VertNormal;
 in vec2 VertTexCoord;
 
@@ -29,17 +29,25 @@ uniform Light dir_light;
 uniform Light spot_light;
 
 
-uniform vec3 camera_pos;
+in vec3 camera_pos_tagent;
+
+in vec3 point_light_pos_tagent;
+in vec3 dir_light_pos_tagent;
+in vec3 spot_light_pos_tagent;
+in vec3 dir_light_dir_tagent;
+in vec3 spot_light_dir_tagent;
+
 
 
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_specular1;
+uniform sampler2D texture_normal1;
 
 
 
 vec3 CalcDirLight(Light light, vec3 norm,vec3 view_dir){
     
-    vec3 light_dir = normalize(-light.dir);
+    vec3 light_dir = normalize(-dir_light_dir_tagent);
     vec3 halfway_dir = normalize(light_dir + view_dir);
 
     // ambient
@@ -56,10 +64,10 @@ vec3 CalcDirLight(Light light, vec3 norm,vec3 view_dir){
 
 vec3 CalcPointLight(Light light, vec3 norm,vec3 view_dir){
 
-    float dist = length(light.pos - VertPos);
+    float dist = length(point_light_pos_tagent - VertPos_tagent);
     float light_strength = light.power/(dist*dist);
 
-    vec3 light_dir = normalize(light.pos - VertPos);
+    vec3 light_dir = normalize(point_light_pos_tagent - VertPos_tagent);
     vec3 halfway_dir = normalize(light_dir + view_dir);
 
     // ambient
@@ -77,13 +85,13 @@ vec3 CalcPointLight(Light light, vec3 norm,vec3 view_dir){
 
 vec3 CalcSpotLight(Light light, vec3 norm,vec3 view_dir){
 
-    float dist = length(light.pos - VertPos);
+    float dist = length(spot_light_pos_tagent - VertPos_tagent);
     float light_strength = light.power/(dist*dist);
 
-    vec3 light_dir = normalize(light.pos - VertPos);
+    vec3 light_dir = normalize(spot_light_pos_tagent - VertPos_tagent);
     vec3 halfway_dir = normalize(light_dir + view_dir);
 
-    float theta = dot(light_dir, normalize(-light.dir));
+    float theta = dot(light_dir, normalize(-spot_light_dir_tagent));
     float intensity = clamp((theta - light.cosR2) / (light.cosR1-light.cosR2), 0.0, 1.0); 
 
     // ambient
@@ -104,12 +112,15 @@ vec3 CalcSpotLight(Light light, vec3 norm,vec3 view_dir){
 
 void main(){
 
-    vec3 norm = normalize(VertNormal);
-    vec3 view_dir = normalize(camera_pos - VertPos);
+    vec3 norm = texture(texture_normal1, VertTexCoord).rgb;
+    norm = normalize(norm * 2.0 - 1.0);
+
+
+    vec3 view_dir = normalize(camera_pos_tagent - VertPos_tagent);
 
     vec3 light_all = CalcPointLight(point_light,norm,view_dir) + CalcDirLight(dir_light,norm,view_dir) + CalcSpotLight(spot_light,norm,view_dir);
 
     FragColor = vec4(light_all, 1.0f);
 
-    //FragColor =vec4(texture(texture_diffuse1,VertTexCoord).rgb,1.0f);
+    //FragColor =vec4(texture(texture_normal1,VertTexCoord).rgb,1.0f);
 }

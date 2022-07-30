@@ -1680,6 +1680,8 @@
     <None Include="Shaders\Postprocess\default.frag" />
     <None Include="Shaders\Postprocess\kernal.frag" />
     <None Include="Shaders\Postprocess\kernal.vert" />
+    <None Include="Shaders\BlinnPhong-NormalMap.frag" />
+    <None Include="Shaders\BlinnPhong-NormalMap.vert" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\GLFW\lib\glfw3.lib" />

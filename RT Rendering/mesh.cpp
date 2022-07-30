@@ -21,8 +21,7 @@ void Mesh::Draw(Shader& shader, Camera& camera, glm::mat4 parent_trans){
     shader.setMat4("proj_sp", camera.GetProjMatrix());
 
 	// bind textures
-	unsigned int diffuseNr = 1;
-    unsigned int specularNr = 1;
+	unsigned int diffuseNr = 1, specularNr = 1, noramlNr = 1;
 
 	for (unsigned int i = 0; i < Textures.size(); ++i) {
 		glActiveTexture(GL_TEXTURE0 + i);
@@ -32,6 +31,9 @@ void Mesh::Draw(Shader& shader, Camera& camera, glm::mat4 parent_trans){
 		}
         if (Textures[i].type == SPECULAR) {
             name = "texture_specular" + std::to_string(specularNr++);
+        }
+        if (Textures[i].type == NORMAL) {
+            name = "texture_normal" + std::to_string(noramlNr++);
         }
 		shader.setInt(name.c_str(), i);
 		glBindTexture(GL_TEXTURE_2D, Textures[i].id);
@@ -79,6 +81,12 @@ void Mesh::setupMesh(){
 
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
+
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(11 * sizeof(float)));
+    glEnableVertexAttribArray(4);
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);

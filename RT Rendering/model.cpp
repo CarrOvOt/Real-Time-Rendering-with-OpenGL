@@ -76,9 +76,9 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene){
             // use models where a vertex can have multiple texture coordinates so we always take the first set (0).
             vertex.TexCoord = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
             // tangent
-            //vertex.Tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+            vertex.Tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
             // bitangent
-            //vertex.Bitangent = glm::vec3(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z);
+            vertex.Bitangent = glm::vec3(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z);
         }
         else{
             vertex.TexCoord = glm::vec2(0.0f, 0.0f);

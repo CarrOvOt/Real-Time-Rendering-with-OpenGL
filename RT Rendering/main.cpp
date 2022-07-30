@@ -214,8 +214,8 @@ int main(){
     Model floor = Model(SHAPE::RECT);
     Model main_model = Model();
     //main_model.LoadModel("Resource/dice/scene.gltf");
-    //main_model.LoadModel("Resource/hk_ump/scene.gltf");
-    main_model.LoadModel("Resource/higokumaru/scene.gltf");
+    main_model.LoadModel("Resource/hk_ump/scene.gltf");
+    //main_model.LoadModel("Resource/higokumaru/scene.gltf");
     //main_model.LoadModel("Resource/pickaxe/scene.gltf");
 
 
@@ -234,7 +234,8 @@ int main(){
 
 
     // shaders    
-    Shader phong_shader = Shader("Shaders/BlinnPhong.vert", "Shaders/BlinnPhong.frag");
+    Shader phong_shader = Shader("Shaders/BlinnPhong-NormalMap.vert", "Shaders/BlinnPhong-NormalMap.frag");
+    //Shader phong_shader = Shader("Shaders/BlinnPhong.vert", "Shaders/BlinnPhong.frag");
     Shader depth_shader = Shader("Shaders/DebugShader/depth.vert", "Shaders/DebugShader/depth.frag");
     Shader outline_shader = Shader("Shaders/Effect/outlining.vert", "Shaders/Effect/outlining.frag");
 
@@ -389,9 +390,9 @@ int main(){
 
             //floor.Draw(phong_shader, mainCamera);
 
-            //_light_point.Draw(mainCamera);
-            //_light_dir.Draw(mainCamera);
-            //_light_spot.Draw(mainCamera);
+            _light_point.Draw(mainCamera);
+            _light_dir.Draw(mainCamera);
+            _light_spot.Draw(mainCamera);
 
 
             glStencilFunc(GL_ALWAYS, 1, 0xFF);

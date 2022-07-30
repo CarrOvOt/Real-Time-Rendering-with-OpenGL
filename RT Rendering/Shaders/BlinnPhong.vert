@@ -14,7 +14,6 @@ uniform mat4 proj_sp;
 
 uniform vec3 model_color;
 
-
 void main(){
 
     gl_Position = proj_sp * view_sp * model_sp * vec4(VPos, 1.0f);

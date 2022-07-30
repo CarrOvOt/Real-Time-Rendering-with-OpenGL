@@ -420,8 +420,30 @@ glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(Indices), &Indices
 
 上：正常；下：边缘检测
 
-
-
 参考资料：[帧缓冲 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/05%20Framebuffers/#_9)
 
 模型资源：[Higokumaru | Honkai Impact 3rd - Download Free 3D model by MooKorea ](https://sketchfab.com/3d-models/higokumaru-honkai-impact-3rd-0e903387170846f5939adaa0c277b91b)
+
+### ver1.6
+
+**法线贴图**
+
+切线/副切线由Assimp计算完成。
+
+注意：
+
+> 法线贴图的切线和副切线与纹理坐标的两个方向对齐
+
+所以一个三角形切线空间的三个基：法线，切线，副切线的方向是确定的。![](MDImages/2022-07-30-16-11-35-image.png)
+
+Shader程序中只能读取不能修改uniform变量，所以我们在顶点着色器中变换光源的世界坐标（和平行光、聚光的方向）单独传递给片段着色器，所以代码看起来有点乱。
+
+<img title="" src="MDImages/2022-07-30-15-37-11-image.png" alt="" width="483"><img src="MDImages/2022-07-30-15-37-28-image.png" title="" alt="" width="483"><img src="MDImages/2022-07-30-15-37-50-image.png" title="" alt="" width="485">
+
+上：只有环境光；中：平行光；下：线框模式。
+
+
+
+参考资料：[法线贴图 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/05%20Advanced%20Lighting/04%20Normal%20Mapping/)
+
+模型资源：[HK UMP - Lowpoly - Download Free 3D model by Enzo Amanrich (@ImaGeniusMan)](https://sketchfab.com/3d-models/hk-ump-lowpoly-77edc85265d4486d928fcb21c5175b10)
