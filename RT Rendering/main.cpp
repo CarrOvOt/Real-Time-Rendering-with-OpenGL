@@ -19,6 +19,7 @@
 #include "gui.h"
 #include "camera.h"
 #include "light.h"
+#include "skybox.h"
 
 // others
 #include <iostream>
@@ -47,7 +48,7 @@ bool showMouse = true;
 // options & settings in GUI
 bool use_wireframe_mode = false;
 
-glm::vec3 background_color = glm::vec3(0.0f, 0.0f, 0.0f );
+glm::vec3 background_color = glm::vec3(0.1f, 0.1f, 0.0f );
 
 glm::vec3 rot_xyz = glm::vec3(-90.0f, 90.0f, 90.0f);
 float scale_xyz = 1.0f;
@@ -251,8 +252,11 @@ int main(){
     mainCamera.Move(CAMERAMOVE::WDUP, 1.0f);
     mainCamera.Move(CAMERAMOVE::BACKWARD, 2.0f);
     mainCamera.Roate(0, 100.0f);
-    mainCamera.Far = 50.0f;
+    //mainCamera.Far = 50.0f;
     //mainCamera.type = CAMERATYPE::ORTHO;
+
+    // skybox
+    Skybox skybox = Skybox();
 
 
 
@@ -289,7 +293,6 @@ int main(){
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 
-
     // MS buffer/texture for MSAA
     unsigned int msBuffer;
     glGenFramebuffers(1, &msBuffer);
@@ -309,12 +312,9 @@ int main(){
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, msRBO);
 
-    // check
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cout << "ERROR::FRAMEBUFFER:: MS Framebuffer is not complete!" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
 
     // screen mesh and shader
     SimpleMesh screen_mesh = SimpleMesh(SHAPE::RECT);
@@ -418,25 +418,37 @@ int main(){
             //floor.Draw(depth_shader, mainCamera);
             //dice.Draw(depth_shader, mainCamera);
 
-
             outline_shader.use();
             outline_shader.setFloat("line_width", 0.02f);
             outline_shader.setVec3("outline_color", glm::vec3(0.7f, 1.0f, 0.7f));
 
-            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-            glStencilMask(0x00);
-
-            //floor.Draw(phong_shader, mainCamera);
-
-            _light_point.Draw(mainCamera);
-            _light_dir.Draw(mainCamera);
-            _light_spot.Draw(mainCamera);
 
 
-            glStencilFunc(GL_ALWAYS, 1, 0xFF);
-            glStencilMask(0xFF);
+            // meshes that may draw outline
+            {
+                glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+                glStencilFunc(GL_ALWAYS, 1, 0xFF);
+                glStencilMask(0xFF);
 
-            main_model.Draw(phong_shader, mainCamera);
+                main_model.Draw(phong_shader, mainCamera);
+
+                glStencilMask(0x00);
+            }
+
+            // meshes that never draw outline
+            {
+                floor.Draw(phong_shader, mainCamera);
+
+                _light_point.Draw(mainCamera);
+                _light_dir.Draw(mainCamera);
+                _light_spot.Draw(mainCamera);
+            }
+
+            //skybox
+            glDepthFunc(GL_LEQUAL);
+            skybox.Draw(mainCamera);
+            glDepthFunc(GL_LESS);
+
 
             if(draw_outline){
                 // draw outline
@@ -446,11 +458,14 @@ int main(){
 
                 main_model.Draw(outline_shader, mainCamera);
 
+                glStencilFunc(GL_ALWAYS, 1, 0xFF);
                 glStencilMask(0xFF); // this will affect glClear
                 glEnable(GL_DEPTH_TEST);
             }
+
         }
          
+        // msaa
         if (use_MSAA) {
             // MS buffer to screen buffer
             glBindFramebuffer(GL_READ_FRAMEBUFFER, msBuffer);
@@ -473,6 +488,7 @@ int main(){
             glBindTexture(GL_TEXTURE_2D, screenTexture);
             screen_mesh.Draw(screen_shader);
         }
+
 
         // GUI
         {

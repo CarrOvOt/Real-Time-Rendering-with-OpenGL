@@ -517,6 +517,7 @@
     <ClInclude Include="model.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="simpleMesh.h" />
+    <ClInclude Include="skybox.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
@@ -532,6 +533,7 @@
     <ClCompile Include="light.cpp" />
     <ClCompile Include="mesh.cpp" />
     <ClCompile Include="model.cpp" />
+    <ClCompile Include="skybox.cpp" />
     <ClCompile Include="stb_image_wrap.cpp" />
     <ClCompile Include="gui.cpp" />
     <ClCompile Include="main.cpp" />
@@ -687,6 +689,8 @@
     <None Include="External\include\glm\gtx\wrap.inl" />
     <None Include="Shaders\BasicShader\lightDraw.frag" />
     <None Include="Shaders\BasicShader\lightDraw.vert" />
+    <None Include="Shaders\BasicShader\skyboxDraw.frag" />
+    <None Include="Shaders\BasicShader\skyboxDraw.vert" />
     <None Include="Shaders\BlinnPhong-NormalMap.frag" />
     <None Include="Shaders\BlinnPhong-NormalMap.vert" />
     <None Include="Shaders\BlinnPhong.frag" />

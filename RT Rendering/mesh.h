@@ -50,7 +50,7 @@ public:
 
 
 	void Draw(Shader& shader, Camera& camera, glm::mat4 parent_trans);
-	void Draw(Shader& shader); // draw without setting any uniform vars.
+	void Draw(Shader& shader); // draw without setting any uniform vars, for screen texture drawing.
 
 
 protected:

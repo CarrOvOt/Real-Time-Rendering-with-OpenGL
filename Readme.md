@@ -442,13 +442,9 @@ Shader程序中只能读取不能修改uniform变量，所以我们在顶点着�
 
 上：只有环境光；中：平行光；下：线框模式。
 
-
-
 参考资料：[法线贴图 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/05%20Advanced%20Lighting/04%20Normal%20Mapping/)
 
 模型资源：[HK UMP - Lowpoly - Download Free 3D model by Enzo Amanrich (@ImaGeniusMan)](https://sketchfab.com/3d-models/hk-ump-lowpoly-77edc85265d4486d928fcb21c5175b10)
-
-
 
 ### ver1.7
 
@@ -465,5 +461,59 @@ Shader程序中只能读取不能修改uniform变量，所以我们在顶点着�
 我们之前的描边宽度非常小，所以锯齿非常严重，开启MSAA后会缓解很多。
 
 参考资料：[抗锯齿 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/11%20Anti%20Aliasing/#openglmsaa)
+
+模型资源：[HK UMP - Lowpoly - Download Free 3D model by Enzo Amanrich (@ImaGeniusMan)](https://sketchfab.com/3d-models/hk-ump-lowpoly-77edc85265d4486d928fcb21c5175b10)
+
+### ver1.8
+
+**立方体贴图 - 天空盒**
+
+新建一个skybox类，剩下的照抄教程即可。
+
+环境映射（Environment Mapping）之后再实现。
+
+（地板缺少了切线信息和法线贴图，所以看起来比较奇怪）
+
+![](MDImages/2022-08-01-22-53-27-image.png)
+
+这是目前我自己尝试出的包含描边和天空盒的正确的渲染顺序，模板缓冲还是不是很熟悉，之后慢慢理解。
+
+```cpp
+// meshes that may draw outline
+ {
+glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+glStencilFunc(GL_ALWAYS, 1, 0xFF);
+glStencilMask(0xFF);
+
+main_model.Draw(phong_shader, mainCamera);
+
+glStencilMask(0x00);
+}
+
+// meshes that never draw outline
+{
+floor.Draw(phong_shader, mainCamera);
+}
+
+//skybox
+glDepthFunc(GL_LEQUAL);
+skybox.Draw(mainCamera);
+glDepthFunc(GL_LESS);
+
+if(draw_outline){
+    // draw outline
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilMask(0x00);
+    glDisable(GL_DEPTH_TEST);
+
+    main_model.Draw(outline_shader, mainCamera);
+
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilMask(0xFF); // this will affect glClear
+    glEnable(GL_DEPTH_TEST);
+}
+```
+
+参考资料：[立方体贴图 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/06%20Cubemaps/#_11)
 
 模型资源：[HK UMP - Lowpoly - Download Free 3D model by Enzo Amanrich (@ImaGeniusMan)](https://sketchfab.com/3d-models/hk-ump-lowpoly-77edc85265d4486d928fcb21c5175b10)

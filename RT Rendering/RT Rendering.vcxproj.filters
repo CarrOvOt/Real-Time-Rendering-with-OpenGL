@@ -1170,6 +1170,9 @@
     <ClInclude Include="External\Assimp\include\assimp\ZipArchiveIOSystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="skybox.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\GLAD\src\glad.c">
@@ -1224,6 +1227,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="light.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="skybox.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1682,6 +1688,8 @@
     <None Include="Shaders\Postprocess\kernal.vert" />
     <None Include="Shaders\BlinnPhong-NormalMap.frag" />
     <None Include="Shaders\BlinnPhong-NormalMap.vert" />
+    <None Include="Shaders\BasicShader\skyboxDraw.frag" />
+    <None Include="Shaders\BasicShader\skyboxDraw.vert" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\GLFW\lib\glfw3.lib" />
