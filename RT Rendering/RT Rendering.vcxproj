@@ -697,8 +697,12 @@
     <None Include="Shaders\BlinnPhong.vert" />
     <None Include="Shaders\DebugShader\depth.frag" />
     <None Include="Shaders\DebugShader\depth.vert" />
+    <None Include="Shaders\Effect\reflect.frag" />
+    <None Include="Shaders\Effect\reflect.vert" />
     <None Include="Shaders\Effect\outlining.frag" />
     <None Include="Shaders\Effect\outlining.vert" />
+    <None Include="Shaders\Effect\refract.frag" />
+    <None Include="Shaders\Effect\refract.vert" />
     <None Include="Shaders\Gouraud.frag" />
     <None Include="Shaders\Gouraud.vert" />
     <None Include="Shaders\Phong.frag" />

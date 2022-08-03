@@ -14,6 +14,8 @@
 
 [billboard效果](./documents/billboard.md)
 
+[Nsight Graphics的简单使用](./documents/NsightGraphics-usage.md)
+
 ### ver0.1
 
 **搭建基础环境，能够显示出一个窗口。**
@@ -513,6 +515,24 @@ if(draw_outline){
     glEnable(GL_DEPTH_TEST);
 }
 ```
+
+参考资料：[立方体贴图 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/06%20Cubemaps/#_11)
+
+模型资源：[HK UMP - Lowpoly - Download Free 3D model by Enzo Amanrich (@ImaGeniusMan)](https://sketchfab.com/3d-models/hk-ump-lowpoly-77edc85265d4486d928fcb21c5175b10)
+
+### ver1.8.1
+
+**立方体贴图 - 环境映射**
+
+需要把反射/折射光投影到世界空间中，所以法线空间的变换在片段着色器中完成（之前是在顶点着色器中进行逆变换）
+
+<img src="MDImages/2022-08-04-01-51-31-image.png" title="" alt="" width="363"><img src="MDImages/2022-08-04-01-53-23-image.png" title="" alt="" width="363">
+
+上：单面折射（Single-side Refraction）
+
+下：反射
+
+
 
 参考资料：[立方体贴图 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/06%20Cubemaps/#_11)
 

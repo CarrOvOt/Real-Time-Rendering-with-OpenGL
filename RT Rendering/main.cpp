@@ -246,6 +246,8 @@ int main(){
     //Shader phong_shader = Shader("Shaders/BlinnPhong.vert", "Shaders/BlinnPhong.frag");
     Shader depth_shader = Shader("Shaders/DebugShader/depth.vert", "Shaders/DebugShader/depth.frag");
     Shader outline_shader = Shader("Shaders/Effect/outlining.vert", "Shaders/Effect/outlining.frag");
+    Shader reflect_shader = Shader("Shaders/Effect/reflect.vert", "Shaders/Effect/reflect.frag");
+    Shader refract_shader = Shader("Shaders/Effect/refract.vert", "Shaders/Effect/refract.frag");
 
 
     // cameras
@@ -422,7 +424,14 @@ int main(){
             outline_shader.setFloat("line_width", 0.02f);
             outline_shader.setVec3("outline_color", glm::vec3(0.7f, 1.0f, 0.7f));
 
+            reflect_shader.use();
+            reflect_shader.setVec3("camera_pos", mainCamera.Position);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetTextureID());
 
+            refract_shader.use();
+            refract_shader.setVec3("camera_pos", mainCamera.Position);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetTextureID());
+            
 
             // meshes that may draw outline
             {
@@ -430,14 +439,17 @@ int main(){
                 glStencilFunc(GL_ALWAYS, 1, 0xFF);
                 glStencilMask(0xFF);
 
-                main_model.Draw(phong_shader, mainCamera);
+                //main_model.Draw(phong_shader, mainCamera);
+                main_model.Draw(reflect_shader, mainCamera);
+                //main_model.Draw(refract_shader, mainCamera);
+
 
                 glStencilMask(0x00);
             }
 
             // meshes that never draw outline
             {
-                floor.Draw(phong_shader, mainCamera);
+                //floor.Draw(phong_shader, mainCamera);
 
                 _light_point.Draw(mainCamera);
                 _light_dir.Draw(mainCamera);

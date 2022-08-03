@@ -104,6 +104,12 @@ void Skybox::ReloadCubemap(std::string path){
     glDeleteTextures(1, &temp);
 }
 
+unsigned int Skybox::GetTextureID(){
+    return texture;
+}
+
+
+
 unsigned int Skybox::loadCubemap(std::string path){
 
         unsigned int textureID;

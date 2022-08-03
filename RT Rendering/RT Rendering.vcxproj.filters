@@ -1690,6 +1690,10 @@
     <None Include="Shaders\BlinnPhong-NormalMap.vert" />
     <None Include="Shaders\BasicShader\skyboxDraw.frag" />
     <None Include="Shaders\BasicShader\skyboxDraw.vert" />
+    <None Include="Shaders\Effect\reflect.vert" />
+    <None Include="Shaders\Effect\reflect.frag" />
+    <None Include="Shaders\Effect\refract.frag" />
+    <None Include="Shaders\Effect\refract.vert" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\GLFW\lib\glfw3.lib" />

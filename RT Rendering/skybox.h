@@ -21,6 +21,9 @@ public:
 
     void ReloadCubemap(std::string path);
 
+	
+	unsigned int GetTextureID();
+
 private:
 
 	Shader shader;
