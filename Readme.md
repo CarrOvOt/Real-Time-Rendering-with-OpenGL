@@ -532,8 +532,20 @@ if(draw_outline){
 
 下：反射
 
-
-
 参考资料：[立方体贴图 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/06%20Cubemaps/#_11)
 
 模型资源：[HK UMP - Lowpoly - Download Free 3D model by Enzo Amanrich (@ImaGeniusMan)](https://sketchfab.com/3d-models/hk-ump-lowpoly-77edc85265d4486d928fcb21c5175b10)
+
+
+
+### ver1.9
+
+**HDR**
+
+修改一下颜色缓冲（屏幕纹理和MSAA的纹理）的格式，然后渲染屏幕矩形的时候进行色调映射（Tone Mapping）即可。
+
+![](MDImages/2022-08-04-23-10-39-image.png)
+
+![](MDImages/2022-08-04-23-10-42-image.png)
+
+上：HDR off；    下：HDR on

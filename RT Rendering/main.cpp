@@ -48,7 +48,7 @@ bool showMouse = true;
 // options & settings in GUI
 bool use_wireframe_mode = false;
 
-glm::vec3 background_color = glm::vec3(0.1f, 0.1f, 0.0f );
+glm::vec3 background_color = glm::vec3(0.1f, 0.1f, 0.1f );
 
 glm::vec3 rot_xyz = glm::vec3(-90.0f, 90.0f, 90.0f);
 float scale_xyz = 1.0f;
@@ -61,8 +61,8 @@ float light_point_power=1.0f;
 glm::vec3 light_dir_rot = glm::vec3(0.0f, 0.0f, 0.0f);
 float light_dir_power = 1.0f;
 
-glm::vec3 light_spot_pos = glm::vec3(0.1f, 0.1f, 0.0f);
-glm::vec3 light_spot_rot = glm::vec3(-45.0f, 0.0f, 0.0f);
+glm::vec3 light_spot_pos = glm::vec3(0.3f, 0.3f, 0.3f);
+glm::vec3 light_spot_rot = glm::vec3(50.0f, 0.0f, 0.0f);
 float light_spot_power = 1.0f;
 
 
@@ -272,7 +272,7 @@ int main(){
     glGenTextures(1, &screenTexture);
     glBindTexture(GL_TEXTURE_2D, screenTexture);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -303,7 +303,7 @@ int main(){
     unsigned int msTexture;
     glGenTextures(1, &msTexture);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, msTexture);
-    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, msaa_samples, GL_RGB, SCR_WIDTH, SCR_HEIGHT, GL_TRUE);
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, msaa_samples, GL_RGB16F, SCR_WIDTH, SCR_HEIGHT, GL_TRUE);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, msTexture, 0);
 
@@ -439,8 +439,8 @@ int main(){
                 glStencilFunc(GL_ALWAYS, 1, 0xFF);
                 glStencilMask(0xFF);
 
-                //main_model.Draw(phong_shader, mainCamera);
-                main_model.Draw(reflect_shader, mainCamera);
+                main_model.Draw(phong_shader, mainCamera);
+                //main_model.Draw(reflect_shader, mainCamera);
                 //main_model.Draw(refract_shader, mainCamera);
 
 
@@ -457,9 +457,12 @@ int main(){
             }
 
             //skybox
-            glDepthFunc(GL_LEQUAL);
-            skybox.Draw(mainCamera);
-            glDepthFunc(GL_LESS);
+            {
+                //glDepthFunc(GL_LEQUAL);
+                //skybox.Draw(mainCamera);
+                //glDepthFunc(GL_LESS);
+            }
+            
 
 
             if(draw_outline){
