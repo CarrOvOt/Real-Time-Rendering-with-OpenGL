@@ -73,6 +73,11 @@ bool draw_outline = false;
 bool use_MSAA = true;
 unsigned int msaa_samples = 4;
 
+bool use_Bloom = true;
+float bloom_strength = 1.0f;
+int bloom_blur = 5;
+
+
 
 // rendering gui window
 void GUITick() {
@@ -94,6 +99,8 @@ void GUITick() {
             ImGui::Checkbox("Wireframe Mode", &use_wireframe_mode);
             ImGui::Checkbox("MSAA", &use_MSAA);
             ImGui::Checkbox("Outline", &draw_outline);
+            ImGui::Checkbox("Bloom", &use_Bloom);
+
         }
         ImGui::Spacing();
 
@@ -108,17 +115,26 @@ void GUITick() {
         }
         ImGui::Spacing();
 
-        ImGui::DragFloat3("point light pos_xyz", (float*)&light_point_pos, 0.05f, -10.0f, 10.0f);
-        ImGui::DragFloat("point light power", (float*)&light_point_power, 0.02f, 0.0f, 5.0f);
+        if (ImGui::CollapsingHeader("Light Setting")) {
+
+            ImGui::DragFloat3("point light pos_xyz", (float*)&light_point_pos, 0.05f, -10.0f, 10.0f);
+            ImGui::DragFloat("point light power", (float*)&light_point_power, 0.02f, 0.0f, 5.0f);
+            ImGui::Spacing();
+
+            ImGui::DragFloat3("direction light rot_xyz", (float*)&light_dir_rot, 5.0f, -180.0f, 180.0f);
+            ImGui::DragFloat("direction light power", (float*)&light_dir_power, 0.02f, 0.0f, 5.0f);
+            ImGui::Spacing();
+
+            ImGui::DragFloat3("spot light pos_xyz", (float*)&light_spot_pos, 0.05f, -10.0f, 10.0f);
+            ImGui::DragFloat3("spot light rot_xyz", (float*)&light_spot_rot, 5.0f, -180.0f, 180.0f);
+            ImGui::DragFloat("spot light power", (float*)&light_spot_power, 0.02f, 0.0f, 5.0f);
+        }
         ImGui::Spacing();
 
-        ImGui::DragFloat3("direction light rot_xyz", (float*)&light_dir_rot, 5.0f, -180.0f, 180.0f);
-        ImGui::DragFloat("direction light power", (float*)&light_dir_power, 0.02f, 0.0f, 5.0f);
-        ImGui::Spacing();
-
-        ImGui::DragFloat3("spot light pos_xyz", (float*)&light_spot_pos, 0.05f, -10.0f, 10.0f);
-        ImGui::DragFloat3("spot light rot_xyz", (float*)&light_spot_rot, 5.0f, -180.0f, 180.0f);
-        ImGui::DragFloat("spot light power", (float*)&light_spot_power, 0.02f, 0.0f, 5.0f);
+        if (ImGui::CollapsingHeader("Bloom Setting")) {
+            ImGui::SliderFloat("bloom strength", &bloom_strength, 0.05f, 2.0f);
+            ImGui::SliderInt("bloom blur", &bloom_blur, 1, 10);
+        }
         ImGui::Spacing();
 
         ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
@@ -183,6 +199,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         
 }
 
+
+
 int main(){
 
     // initialize GLFW
@@ -213,6 +231,10 @@ int main(){
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+    const char* version = (const char*)glGetString(GL_VERSION);
+    printf("OpenGL version : %s\n", version);
+
 
     // ImGUI
     GUI::ImGUIInit(window);
@@ -279,6 +301,19 @@ int main(){
     // bind screen texture to screen buffer
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, screenTexture, 0);
 
+    // screen texture - blooming
+    unsigned int screenBloomTexture;
+    glGenTextures(1, &screenBloomTexture);
+    glBindTexture(GL_TEXTURE_2D, screenBloomTexture);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, screenBloomTexture, 0);
+
+    unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    glDrawBuffers(2, attachments);
 
     // use Renderbuffer Object to get depth and stencil
     unsigned int rbo;
@@ -307,6 +342,16 @@ int main(){
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, msTexture, 0);
 
+    unsigned int msBloomTexture;
+    glGenTextures(1, &msBloomTexture);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, msBloomTexture);
+    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, msaa_samples, GL_RGB16F, SCR_WIDTH, SCR_HEIGHT, GL_TRUE);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D_MULTISAMPLE, msBloomTexture, 0);
+
+    //unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    glDrawBuffers(2, attachments);
+
     unsigned int msRBO;
     glGenRenderbuffers(1, &msRBO);
     glBindRenderbuffer(GL_RENDERBUFFER, msRBO);
@@ -318,12 +363,43 @@ int main(){
         std::cout << "ERROR::FRAMEBUFFER:: MS Framebuffer is not complete!" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+
+
+    // buffers for GaussianBlur on bloom texture
+    GLuint pingpongFBO[2];
+    GLuint pingpongBuffer[2];
+    glGenFramebuffers(2, pingpongFBO);
+    glGenTextures(2, pingpongBuffer);
+    for (GLuint i = 0; i < 2; i++) {
+
+        glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
+        glBindTexture(GL_TEXTURE_2D, pingpongBuffer[i]);
+        glTexImage2D(
+            GL_TEXTURE_2D, 0, GL_RGB16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_FLOAT, NULL
+        );
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glFramebufferTexture2D(
+            GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongBuffer[i], 0
+        );
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+            std::cout << "Framebuffer not complete!" << std::endl;
+    }
+
+    SimpleMesh rect = SimpleMesh(SHAPE::RECT);
+    rect.RemoveTextures();
+    Shader shaderBlur = Shader("Shaders/Postprocess/gaussianBlur.vert", "Shaders/Postprocess/gaussianBlur.frag");
+
+
+
+
     // screen mesh and shader
     SimpleMesh screen_mesh = SimpleMesh(SHAPE::RECT);
     screen_mesh.RemoveTextures();
     Shader screen_shader = Shader("Shaders/Postprocess/default.vert", "Shaders/Postprocess/default.frag");
     //Shader screen_shader = Shader("Shaders/Postprocess/kernal.vert", "Shaders/Postprocess/kernal.frag");
-
 
 
     // rendering loop
@@ -374,6 +450,7 @@ int main(){
                 glBindFramebuffer(GL_FRAMEBUFFER, screenBuffer);
             }
             
+            glDrawBuffers(2, attachments);
 
             glEnable(GL_DEPTH_TEST);
             //glEnable(GL_FRAMEBUFFER_SRGB);
@@ -412,6 +489,8 @@ int main(){
             phong_shader.setVec3("spot_light.specular", _light_spot.specular);
 
             phong_shader.setVec3("camera_pos", mainCamera.Position);
+
+            phong_shader.setFloat("bloom_threshold", bloom_strength * bloom_strength);
 
             //glDisable(GL_FRAMEBUFFER_SRGB);
             //depth_shader.use();
@@ -462,7 +541,6 @@ int main(){
                 //skybox.Draw(mainCamera);
                 //glDepthFunc(GL_LESS);
             }
-            
 
 
             if(draw_outline){
@@ -485,13 +563,57 @@ int main(){
             // MS buffer to screen buffer
             glBindFramebuffer(GL_READ_FRAMEBUFFER, msBuffer);
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, screenBuffer);
+
+            glReadBuffer(attachments[0]);
+            glDrawBuffer(attachments[0]);
             glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+            glReadBuffer(attachments[1]);
+            glDrawBuffer(attachments[1]);
+            glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+            glDrawBuffers(2, attachments);
+        }
+
+
+        // GaussianBlur on bloom texture
+        {
+            GLboolean first_iteration = true;
+            GLuint iter = bloom_blur;
+            shaderBlur.use();
+
+            for (GLuint i = 0; i < iter; i++) {
+
+                glBindFramebuffer(GL_READ_FRAMEBUFFER, pingpongFBO[0]);
+                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, pingpongFBO[1]);
+
+                glActiveTexture(0);
+                glBindTexture(GL_TEXTURE_2D, first_iteration ? screenBloomTexture : pingpongBuffer[0]);
+                shaderBlur.setBool("horizontal", true);
+                rect.Draw(shaderBlur);
+
+                glBindFramebuffer(GL_READ_FRAMEBUFFER, pingpongFBO[1]);
+                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, pingpongFBO[0]);
+
+                glActiveTexture(0);
+                glBindTexture(GL_TEXTURE_2D, pingpongBuffer[1]);
+                shaderBlur.setBool("horizontal", false);
+                rect.Draw(shaderBlur);
+
+
+                if (first_iteration)
+                    first_iteration = false;
+
+            }
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
         }
 
 
         // second pass
         {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
             glEnable(GL_FRAMEBUFFER_SRGB);
             glDisable(GL_DEPTH_TEST);
             
@@ -500,7 +622,13 @@ int main(){
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
             screen_shader.use();
+            screen_shader.setBool("useBloom", use_Bloom);
+            glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, screenTexture);
+            screen_shader.setInt("screenTexture", 0);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, pingpongBuffer[0]);
+            screen_shader.setInt("screenBloomTexture", 1);
             screen_mesh.Draw(screen_shader);
         }
 

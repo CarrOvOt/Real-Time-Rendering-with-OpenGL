@@ -236,6 +236,8 @@ QE：上下移动（世界空间）
 
 [枚举、按位与或运算、位移的简单应用 - 连程 - 博客园 (cnblogs.com)](https://www.cnblogs.com/anxin1225/p/4063610.html)
 
+
+
 ### ver0.9.1
 
 **Gouraud着色（Gouraud Shading）**
@@ -243,6 +245,8 @@ QE：上下移动（世界空间）
 Gouraud着色就是Phong着色的顶点着色器实现版本，在顶点上计算光照，然后插值在片面上，因为顶点数量比片段少很多，所以速度很快，但是在顶点数量很少的时候，比如我们的立方体，渲染结果会非常差。
 
 ![](MDImages/2022-07-11-23-27-56-image.png)
+
+
 
 ### ver0.9.2
 
@@ -275,6 +279,8 @@ struct Light {
 
 参考资料：[材质 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/02%20Lighting/03%20Materials/#_1)
 
+
+
 ### ver0.9.3
 
 **材质纹理**
@@ -286,6 +292,8 @@ struct Light {
 ![](MDImages/2022-07-16-19-36-31-image.png)
 
 参考资料：[光照贴图 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/02%20Lighting/04%20Lighting%20maps/)
+
+
 
 ### ver1.0
 
@@ -311,6 +319,8 @@ struct Light {
 
 [OpenGl 基本函数 glDrawArrays 详解_frank06504的博客-CSDN博客](https://blog.csdn.net/frank06504/article/details/117523329)
 
+
+
 ### ver1.1
 
 **Gamma校正**
@@ -331,21 +341,25 @@ struct Light {
 
 [色彩校正中的 gamma 值是什么？ - 韩世麟的回答 - 知乎](https://www.zhihu.com/question/27467127/answer/37555901)
 
+
+
 ### ver1.1.1
 
 **Blinn-Phong Shading**
 
 对Phong Shading中的镜面光进行优化
 
-<img src="MDImages/2022-07-23-03-49-54-image.png" title="" alt="" width="461">
+<img src="MDImages/2022-07-23-03-49-54-image.png" title="" alt="" width="461"> 
 
-<img src="MDImages/2022-07-23-03-48-14-image.png" title="" alt="" width="461">
+<img src="MDImages/2022-07-23-03-48-14-image.png" title="" alt="" width="461"> 
 
 上图为Phong Shading，下图为Blinn-Phong Shading，这个对比不是很强，没有LearnOpenGL中的例子明显。
 
 这里我们顺便修复一个相机的bug，之前我们的相机有一个Height和Width参数用来表示相机的视野，当时我们直接将窗口大小（800x600）赋值给它们，但这个大小的单位是世界坐标的单位，所以800x600的视野是几乎看不到我们的物体（1x1左右的大小），这会导致相机设置为正射投影时看不到东西（透视投影时Height和Width只用来计算长宽的比例，所以透视投影能正常显示），这里我们修改一下Height和Width的设置，让正射投影的相机也能正常显示。
 
 参考资料：[高级光照 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/05%20Advanced%20Lighting/01%20Advanced%20Lighting/)
+
+
 
 ### ver1.2
 
@@ -372,6 +386,8 @@ glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(Indices), &Indices
 
 [C++中sizeof(vector)的问题 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/257423774)
 
+
+
 ### ver1.3
 
 **深度缓冲**
@@ -387,6 +403,8 @@ glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(Indices), &Indices
 参考资料：[深度测试 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/01%20Depth%20testing/#_1)
 
 模型资源：[DICE - Download Free 3D model by SHARK FIN (@mo7amed85)](https://sketchfab.com/3d-models/free-hq-pbr-game-model-metallic-sapphire-dice-f4e12f278ea74f648eeaaaec245a4a44)
+
+
 
 ### ver1.4
 
@@ -410,6 +428,8 @@ glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(Indices), &Indices
 
 [HK UMP - Lowpoly - Download Free 3D model by Enzo Amanrich (@ImaGeniusMan)](https://sketchfab.com/3d-models/hk-ump-lowpoly-77edc85265d4486d928fcb21c5175b10)
 
+
+
 ### ver1.5
 
 **帧缓冲**
@@ -425,6 +445,8 @@ glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(Indices), &Indices
 参考资料：[帧缓冲 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/05%20Framebuffers/#_9)
 
 模型资源：[Higokumaru | Honkai Impact 3rd - Download Free 3D model by MooKorea ](https://sketchfab.com/3d-models/higokumaru-honkai-impact-3rd-0e903387170846f5939adaa0c277b91b)
+
+
 
 ### ver1.6
 
@@ -448,6 +470,8 @@ Shader程序中只能读取不能修改uniform变量，所以我们在顶点着�
 
 模型资源：[HK UMP - Lowpoly - Download Free 3D model by Enzo Amanrich (@ImaGeniusMan)](https://sketchfab.com/3d-models/hk-ump-lowpoly-77edc85265d4486d928fcb21c5175b10)
 
+
+
 ### ver1.7
 
 **抗锯齿/反走样 Anti-aliasing**
@@ -465,6 +489,8 @@ Shader程序中只能读取不能修改uniform变量，所以我们在顶点着�
 参考资料：[抗锯齿 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/11%20Anti%20Aliasing/#openglmsaa)
 
 模型资源：[HK UMP - Lowpoly - Download Free 3D model by Enzo Amanrich (@ImaGeniusMan)](https://sketchfab.com/3d-models/hk-ump-lowpoly-77edc85265d4486d928fcb21c5175b10)
+
+
 
 ### ver1.8
 
@@ -520,6 +546,8 @@ if(draw_outline){
 
 模型资源：[HK UMP - Lowpoly - Download Free 3D model by Enzo Amanrich (@ImaGeniusMan)](https://sketchfab.com/3d-models/hk-ump-lowpoly-77edc85265d4486d928fcb21c5175b10)
 
+
+
 ### ver1.8.1
 
 **立方体贴图 - 环境映射**
@@ -544,8 +572,90 @@ if(draw_outline){
 
 修改一下颜色缓冲（屏幕纹理和MSAA的纹理）的格式，然后渲染屏幕矩形的时候进行色调映射（Tone Mapping）即可。
 
-![](MDImages/2022-08-04-23-10-39-image.png)
+![](MDImages/2022-08-04-23-10-39-image.png) 
 
-![](MDImages/2022-08-04-23-10-42-image.png)
+![](MDImages/2022-08-04-23-10-42-image.png) 
 
 上：HDR off；    下：HDR on
+
+参考资料：[HDR - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/05%20Advanced%20Lighting/06%20HDR/)
+
+
+
+### ver1.9.1
+
+**泛光（Bloom）**
+
+补充一下之前关于多个纹理的绑定问题：
+
+1. 激活**纹理单元**；`glActiveTexture(GL_TEXTURE0 + i);`
+
+2. 绑定**纹理**到**纹理单元**；`glBindTexture(GL_TEXTURE_2D, screenTexture);`
+
+3. 绑定**纹理单元**到**采样器名称**；`shader.setInt("sampler2D_name", 0 + i);`
+
+   
+
+在使用MSAA的基础上使用泛光时，ms的帧缓冲和屏幕缓冲都有两个颜色附件（color attachment），上面使用了`glDrawBuffers(2, attachments);`会让readbuffer读取到的颜色附件同时被写到drawbuffer的**所有**颜色附件中，所以我们指定颜色附件的读写：
+
+```cpp
+// msaa
+if (use_MSAA) {
+    // MS buffer to screen buffer
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, msBuffer);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, screenBuffer);
+
+    glReadBuffer(attachments[0]);
+    glDrawBuffer(attachments[0]);
+    glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+    glReadBuffer(attachments[1]);
+    glDrawBuffer(attachments[1]);
+    glBlitFramebuffer(0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+    glDrawBuffers(2, attachments);
+}
+```
+
+注意最后要再次调用`glDrawBuffers(2, attachments);`保证之后的帧正常渲染（因为之前的这个语句写在渲染循环之外），或者将这个语句放在渲染循环内。
+
+然后高斯模糊的实现我们稍微修改一下，直接将ReadBuffer和DrawBuffer分开指定，交替渲染，依次垂直/水平模糊。
+
+``` cpp
+for (GLuint i = 0; i < iter; i++) {
+
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, pingpongFBO[0]);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, pingpongFBO[1]);
+
+    glActiveTexture(0);
+    glBindTexture(GL_TEXTURE_2D, first_iteration ? screenBloomTexture : pingpongBuffer[0]);
+    shaderBlur.setBool("horizontal", true);
+    rect.Draw(shaderBlur);
+
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, pingpongFBO[1]);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, pingpongFBO[0]);
+
+    glActiveTexture(0);
+    glBindTexture(GL_TEXTURE_2D, pingpongBuffer[1]);
+    shaderBlur.setBool("horizontal", false);
+    rect.Draw(shaderBlur);
+
+    if (first_iteration)
+        first_iteration = false;
+
+}
+```
+
+<img src="MDImages/image-20220806200034837.png" alt="image-20220806200034837" style="zoom: 50%;" /> 
+
+<img src="MDImages/image-20220806200047935.png" alt="image-20220806200047935" style="zoom:50%;" /> 
+
+上：Bloom off；下：Bloom on
+
+参考资料：
+
+[泛光 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/05%20Advanced%20Lighting/07%20Bloom/)
+
+https://blog.csdn.net/What_can_you_do/article/details/125605463
+
+[opengl - Does glBlitFramebuffer copy all color attachments if GL_COLOR_BUFFER_BIT mask is specified? - Stack Overflow](https://stackoverflow.com/questions/17691702/does-glblitframebuffer-copy-all-color-attachments-if-gl-color-buffer-bit-mask-is)

@@ -708,6 +708,8 @@
     <None Include="Shaders\Phong.frag" />
     <None Include="Shaders\Postprocess\default.frag" />
     <None Include="Shaders\Postprocess\default.vert" />
+    <None Include="Shaders\Postprocess\gaussianBlur.frag" />
+    <None Include="Shaders\Postprocess\gaussianBlur.vert" />
     <None Include="Shaders\Postprocess\kernal.frag" />
     <None Include="Shaders\Postprocess\kernal.vert" />
     <None Include="Shaders\pure.frag" />

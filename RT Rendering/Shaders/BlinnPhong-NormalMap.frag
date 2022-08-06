@@ -1,6 +1,7 @@
 #version 330 core
 
-
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 BloomColor;
 
 
 struct Light{
@@ -20,8 +21,6 @@ in vec3 VertNormal;
 in vec2 VertTexCoord;
 
 
-out vec4 FragColor;
-
 uniform float shininess;
 
 uniform Light point_light;
@@ -37,7 +36,7 @@ in vec3 spot_light_pos_tagent;
 in vec3 dir_light_dir_tagent;
 in vec3 spot_light_dir_tagent;
 
-
+uniform float bloom_threshold;
 
 uniform sampler2D texture_diffuse1;
 uniform sampler2D texture_specular1;
@@ -123,4 +122,10 @@ void main(){
     FragColor = vec4(light_all, 1.0f);
 
     //FragColor =vec4(texture(texture_normal1,VertTexCoord).rgb,1.0f);
+
+
+    float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+    if(brightness > bloom_threshold)
+        BloomColor = vec4(FragColor.rgb, 1.0);
+
 }
