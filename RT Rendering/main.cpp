@@ -242,6 +242,7 @@ int main(){
 
     // models
     Model floor = Model(SHAPE::RECT);
+    Model a_sphere = Model(SHAPE::SPHERE);
     Model main_model = Model();
     //main_model.LoadModel("Resource/dice/scene.gltf");
     main_model.LoadModel("Resource/hk_ump/scene.gltf");
@@ -452,8 +453,8 @@ int main(){
             
             glDrawBuffers(2, attachments);
 
+            glDisable(GL_FRAMEBUFFER_SRGB);
             glEnable(GL_DEPTH_TEST);
-            //glEnable(GL_FRAMEBUFFER_SRGB);
             glEnable(GL_STENCIL_TEST);
             glEnable(GL_CULL_FACE);
 
@@ -518,9 +519,11 @@ int main(){
                 glStencilFunc(GL_ALWAYS, 1, 0xFF);
                 glStencilMask(0xFF);
 
-                main_model.Draw(phong_shader, mainCamera);
+                //main_model.Draw(phong_shader, mainCamera);
                 //main_model.Draw(reflect_shader, mainCamera);
                 //main_model.Draw(refract_shader, mainCamera);
+
+                a_sphere.Draw(phong_shader, mainCamera);
 
 
                 glStencilMask(0x00);
@@ -528,6 +531,7 @@ int main(){
 
             // meshes that never draw outline
             {
+
                 //floor.Draw(phong_shader, mainCamera);
 
                 _light_point.Draw(mainCamera);

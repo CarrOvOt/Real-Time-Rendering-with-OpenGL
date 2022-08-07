@@ -14,7 +14,8 @@ using namespace std;
 
 enum SHAPE {
 	CUBE,
-	RECT
+	RECT,
+	SPHERE
 };
 
 
@@ -32,6 +33,9 @@ public:
 private:
 
 	Texture loadTexture(string file_path, TEXTURE_TYPE type);
+
+	void setupTangent();
+	void calculateTangent(Vertex a, Vertex b, Vertex c, glm::vec3& tangent, glm::vec3& bitangent);
 	
 };
 

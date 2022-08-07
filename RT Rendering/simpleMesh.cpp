@@ -98,8 +98,11 @@ SimpleMesh::SimpleMesh(){
         Indices.emplace_back(CubeIndic[i]);
     }
 
-    Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_COL_1K.jpg",TEXTURE_TYPE::DIFFUSE));
+    Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_COL_1K.jpg", TEXTURE_TYPE::DIFFUSE));
     Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_REFL_1K.jpg", TEXTURE_TYPE::SPECULAR));
+    Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_NRM_1K.jpg", TEXTURE_TYPE::NORMAL));
+
+    setupTangent();
 
     
     setupMesh();
@@ -121,6 +124,9 @@ SimpleMesh::SimpleMesh(SHAPE shape){
 
         Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_COL_1K.jpg", TEXTURE_TYPE::DIFFUSE));
         Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_REFL_1K.jpg", TEXTURE_TYPE::SPECULAR));
+        Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_NRM_1K.jpg", TEXTURE_TYPE::NORMAL));
+
+        setupTangent();
 
     }
 
@@ -138,6 +144,56 @@ SimpleMesh::SimpleMesh(SHAPE shape){
 
         Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_COL_1K.jpg", TEXTURE_TYPE::DIFFUSE));
         Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_REFL_1K.jpg", TEXTURE_TYPE::SPECULAR));
+        Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_NRM_1K.jpg", TEXTURE_TYPE::NORMAL));
+
+        setupTangent();
+    }
+
+    if (shape == SPHERE) {
+
+        using glm::vec2;
+        using glm::vec3;
+        using glm::sin;
+        using glm::cos;
+
+        int USEG = 64;
+        int VSEG = 64;
+        float PI = 3.14159265359f;
+
+        for (int i = 0; i < USEG+1; ++i) {
+            for (int j = 0; j < VSEG+1; ++j) {
+
+                float alpha = 2 * PI / USEG * i;
+                float beta = PI / VSEG * j - PI / 2;
+                Vertex v;
+                v.Position = vec3(cos(beta)*sin(alpha),sin(beta), cos(beta) * cos(alpha));
+                v.Normal = v.Position;
+                v.TexCoord = vec2((float)i/USEG, (float)j/VSEG);
+
+                this->Vertices.push_back(v);
+            }
+        }
+
+        for (int i = 0; i < USEG; ++i) {
+            for (int j = 0; j < VSEG; ++j) {
+                if (j != VSEG - 1) {
+                    this->Indices.push_back(i * (VSEG +1) + j);
+                    this->Indices.push_back((i + 1) * (VSEG + 1) + j + 1);
+                    this->Indices.push_back(i * (VSEG + 1) + j + 1);
+                }
+                if (j != 0) {
+                    this->Indices.push_back(i * (VSEG + 1) + j);
+                    this->Indices.push_back((i + 1) * (VSEG + 1) + j );
+                    this->Indices.push_back((i + 1) * (VSEG + 1) + j + 1);
+                }
+            }
+        }
+        
+        Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_COL_1K.jpg", TEXTURE_TYPE::DIFFUSE));
+        Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_REFL_1K.jpg", TEXTURE_TYPE::SPECULAR));
+        Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_NRM_1K.jpg", TEXTURE_TYPE::NORMAL));
+
+        setupTangent();
     }
 
     setupMesh();
@@ -181,6 +237,64 @@ Texture SimpleMesh::loadTexture(string file_path, TEXTURE_TYPE type){
     glBindTexture(GL_TEXTURE_2D, 0);
 
     return Texture{texture_id, type, file_path};
+}
+
+void SimpleMesh::setupTangent(){
+
+    using glm::vec2;
+    using glm::vec3;
+
+    // calculate and average tangents of one vertex that belongs to several triangles
+    vector<vector<vec3>> tangents = vector<vector<vec3>>(Vertices.size());
+    vector<vector<vec3>> bitangents = vector<vector<vec3>>(Vertices.size());
+    for (int i = 0; i < Indices.size();i+=3) {
+        vec3 t, b;
+        calculateTangent(Vertices[Indices[i]], Vertices[Indices[i + 1]], Vertices[Indices[i + 2]],t,b);
+
+        tangents[Indices[i]].push_back(t);
+        tangents[Indices[i+1]].push_back(t);
+        tangents[Indices[i+2]].push_back(t);
+        bitangents[Indices[i]].push_back(b);
+        bitangents[Indices[i + 1]].push_back(b);
+        bitangents[Indices[i + 2]].push_back(b);
+    }
+
+    for (int i = 0; i < Vertices.size(); ++i) {
+        vec3 t = vec3(0.0f);
+        vec3 b = vec3(0.0f);
+        for (int j = 0; j < tangents[i].size(); ++j) {
+            t = t + tangents[i][j];
+            b = b + bitangents[i][j];
+        }
+        Vertices[i].Tangent = glm::normalize(t);
+        Vertices[i].Bitangent = glm::normalize(b);
+    }
+
+}
+
+void SimpleMesh::calculateTangent(Vertex a, Vertex b, Vertex c, glm::vec3& tangent, glm::vec3& bitangent){
+
+    using glm::vec3;
+    using glm::vec2;
+
+
+    vec3 edge1 = b.Position - a.Position;
+    vec3 edge2 = c.Position - a.Position;
+    vec2 deltaUV1 = b.TexCoord - a.TexCoord;
+    vec2 deltaUV2 = c.TexCoord - a.TexCoord;
+
+    GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+    tangent.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+    tangent.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+    tangent.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+    tangent = glm::normalize(tangent);
+
+    bitangent.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+    bitangent.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+    bitangent.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+    bitangent = glm::normalize(bitangent);
+
 }
 
 

@@ -128,4 +128,5 @@ void main(){
     if(brightness > bloom_threshold)
         BloomColor = vec4(FragColor.rgb, 1.0);
 
+
 }

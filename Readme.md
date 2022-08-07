@@ -341,6 +341,10 @@ struct Light {
 
 [色彩校正中的 gamma 值是什么？ - 韩世麟的回答 - 知乎](https://www.zhihu.com/question/27467127/answer/37555901)
 
+材质资源：
+
+[Poliigon - Textures, Models and HDRIs for 3D rendering](https://www.poliigon.com/)
+
 
 
 ### ver1.1.1
@@ -659,3 +663,39 @@ for (GLuint i = 0; i < iter; i++) {
 https://blog.csdn.net/What_can_you_do/article/details/125605463
 
 [opengl - Does glBlitFramebuffer copy all color attachments if GL_COLOR_BUFFER_BIT mask is specified? - Stack Overflow](https://stackoverflow.com/questions/17691702/does-glblitframebuffer-copy-all-color-attachments-if-gl-color-buffer-bit-mask-is)
+
+
+
+### ver1.9.2
+
+**生成球体网格（Sphere Mesh）**
+
+打算下一部分开始PBR的部分，在这之前我们先小小造个轮子，实现球体网格的生成，方便看着色器效果。
+
+这里先实现UV Sphere，比较直观。
+
+<img src="MDImages/image-20220807153731343.png" alt="image-20220807153731343" style="zoom:50%;" /> 
+
+注意缝合线的位置是需要拆点的，所以极点和竖直的缝合线上的点都需要有，所以alpha和beta的左右都是闭区间。
+
+切线和副切线的计算参考LearnOpenGL的法线贴图这一节，顺便把之前的立方体，矩形的mesh的切线也补上了。
+
+[LearnOpenGL - Lighting](https://learnopengl.com/PBR/Lighting) 这一节的源码使用了GL_TRIANGLE_STRIP进行绘制，我们还是按照之前的GL_TRIANGLE绘制，所以生成index的代码不能直接照抄，还是自己写一下吧（注意要逆时针顺序保证三角形面法线朝外）。
+
+<img src="MDImages/image-20220807213906515.png" alt="image-20220807213906515" style="zoom:50%;" /> 
+
+
+
+
+
+参考资料：
+
+[LearnOpenGL - Lighting](https://learnopengl.com/PBR/Lighting) 这一节的源码
+
+[法线贴图 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/05 Advanced Lighting/04 Normal Mapping/#_3)
+
+[UV Sphere (catlikecoding.com)](https://catlikecoding.com/unity/tutorials/procedural-meshes/uv-sphere/)
+
+[catch 22 - Andreas Kahler's blog: Creating an icosphere mesh in code](http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html)
+
+[理解GL_TRIANGLE_STRIP等绘制三角形序列的三种方式-CSDN博客](https://blog.csdn.net/xiajun07061225/article/details/7455283)
