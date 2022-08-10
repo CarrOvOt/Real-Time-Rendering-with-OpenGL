@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -705,6 +705,8 @@
     <None Include="Shaders\Effect\refract.vert" />
     <None Include="Shaders\Gouraud.frag" />
     <None Include="Shaders\Gouraud.vert" />
+    <None Include="Shaders\PBR.frag" />
+    <None Include="Shaders\PBR.vert" />
     <None Include="Shaders\Phong.frag" />
     <None Include="Shaders\Postprocess\default.frag" />
     <None Include="Shaders\Postprocess\default.vert" />

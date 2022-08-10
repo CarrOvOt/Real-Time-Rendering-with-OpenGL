@@ -120,8 +120,8 @@ void main(){
     vec3 light_all = CalcPointLight(point_light,norm,view_dir) + CalcDirLight(dir_light,norm,view_dir) + CalcSpotLight(spot_light,norm,view_dir);
 
     FragColor = vec4(light_all, 1.0f);
-
     //FragColor =vec4(texture(texture_normal1,VertTexCoord).rgb,1.0f);
+    //FragColor =vec4(VertNormal,1.0f);
 
 
     float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));

@@ -16,6 +16,8 @@
 
 [Nsight Graphics的简单使用](./documents/NsightGraphics-usage.md)
 
+[PBR的一个简单实现 - 直接光照](./documents/PBR-direct-light.md)
+
 ### ver0.1
 
 **搭建基础环境，能够显示出一个窗口。**
@@ -466,7 +468,13 @@ glBufferData(GL_ELEMENT_ARRAY_BUFFER, Indices.size() * sizeof(Indices), &Indices
 
 Shader程序中只能读取不能修改uniform变量，所以我们在顶点着色器中变换光源的世界坐标（和平行光、聚光的方向）单独传递给片段着色器，所以代码看起来有点乱。
 
-<img title="" src="MDImages/2022-07-30-15-37-11-image.png" alt="" width="483"><img src="MDImages/2022-07-30-15-37-28-image.png" title="" alt="" width="483"><img src="MDImages/2022-07-30-15-37-50-image.png" title="" alt="" width="485">
+<img title="" src="MDImages/2022-07-30-15-37-11-image.png" alt="" width="483"> 
+
+<img src="MDImages/2022-07-30-15-37-28-image.png" title="" alt="" width="483"> 
+
+<img src="MDImages/2022-07-30-15-37-50-image.png" title="" alt="" width="485"> 
+
+
 
 上：只有环境光；中：平行光；下：线框模式。
 
@@ -699,3 +707,27 @@ https://blog.csdn.net/What_can_you_do/article/details/125605463
 [catch 22 - Andreas Kahler's blog: Creating an icosphere mesh in code](http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html)
 
 [理解GL_TRIANGLE_STRIP等绘制三角形序列的三种方式-CSDN博客](https://blog.csdn.net/xiajun07061225/article/details/7455283)
+
+
+
+### ver2.0
+
+**PBR - 直接光照**
+
+首先修正一下之前的一个bug，在使用正交相机时，视线方向应该是相机方向而不是用相机位置减去片段位置。
+
+PBR相关的教程比较多了，但是还是自己稍微写了一下这样理解得清楚一些：[PBR的一个简单实现 - 直接光照](./documents/PBR-direct-light.md)
+
+这张图中只有一个平行光。
+
+<img src="MDImages/image-20220810211828375.png" alt="image-20220810211828375" style="zoom: 67%;" /> 
+
+左：粗糙度为0；下：金属度为0；右：粗糙度为1；上：金属度为1；
+
+
+
+参考资料：
+
+[理论 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/07 PBR/01 Theory/)
+
+[如何在Unity中造一个PBR Shader轮子 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/68025039)

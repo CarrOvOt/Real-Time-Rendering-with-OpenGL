@@ -1696,6 +1696,8 @@
     <None Include="Shaders\Effect\refract.vert" />
     <None Include="Shaders\Postprocess\gaussianBlur.frag" />
     <None Include="Shaders\Postprocess\gaussianBlur.vert" />
+    <None Include="Shaders\PBR.frag" />
+    <None Include="Shaders\PBR.vert" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\GLFW\lib\glfw3.lib" />

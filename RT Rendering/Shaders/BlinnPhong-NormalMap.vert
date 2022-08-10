@@ -65,7 +65,7 @@ void main(){
     dir_light_dir_tagent = inv_TBN * dir_light.dir;
     spot_light_dir_tagent = inv_TBN * spot_light.dir;
 
-    VertNormal = (model_sp * vec4(VNormal, 1.0f)).xyz;
-    VertPos_tagent = inv_TBN * (model_sp * vec4(VPos, 1.0f)).xyz;
+    VertNormal = (model_sp * vec4(VNormal, 0.0f)).xyz;
+    VertPos_tagent = inv_TBN * (model_sp * vec4(VPos, 0.0f)).xyz;
     VertTexCoord = VTexCoord;
 }

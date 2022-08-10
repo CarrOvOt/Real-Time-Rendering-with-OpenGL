@@ -73,7 +73,7 @@ bool draw_outline = false;
 bool use_MSAA = true;
 unsigned int msaa_samples = 4;
 
-bool use_Bloom = true;
+bool use_Bloom = false;
 float bloom_strength = 1.0f;
 int bloom_blur = 5;
 
@@ -267,18 +267,21 @@ int main(){
     // shaders    
     Shader phong_shader = Shader("Shaders/BlinnPhong-NormalMap.vert", "Shaders/BlinnPhong-NormalMap.frag");
     //Shader phong_shader = Shader("Shaders/BlinnPhong.vert", "Shaders/BlinnPhong.frag");
-    Shader depth_shader = Shader("Shaders/DebugShader/depth.vert", "Shaders/DebugShader/depth.frag");
+    //Shader depth_shader = Shader("Shaders/DebugShader/depth.vert", "Shaders/DebugShader/depth.frag");
     Shader outline_shader = Shader("Shaders/Effect/outlining.vert", "Shaders/Effect/outlining.frag");
-    Shader reflect_shader = Shader("Shaders/Effect/reflect.vert", "Shaders/Effect/reflect.frag");
-    Shader refract_shader = Shader("Shaders/Effect/refract.vert", "Shaders/Effect/refract.frag");
+    //Shader reflect_shader = Shader("Shaders/Effect/reflect.vert", "Shaders/Effect/reflect.frag");
+    //Shader refract_shader = Shader("Shaders/Effect/refract.vert", "Shaders/Effect/refract.frag");
+    Shader pbr_shader = Shader("Shaders/PBR.vert", "Shaders/PBR.frag");
 
 
     // cameras
-    mainCamera.Move(CAMERAMOVE::WDUP, 1.0f);
-    mainCamera.Move(CAMERAMOVE::BACKWARD, 2.0f);
-    mainCamera.Roate(0, 100.0f);
+    //mainCamera.Move(CAMERAMOVE::WDUP, 1.0f);
+    mainCamera.Move(CAMERAMOVE::BACKWARD, 8.0f);
+    //mainCamera.Roate(0, 90.0f);
     //mainCamera.Far = 50.0f;
-    //mainCamera.type = CAMERATYPE::ORTHO;
+    mainCamera.type = CAMERATYPE::ORTHO;
+    mainCamera.Height = 2.2 * mainCamera.Height;
+    mainCamera.Width = 2.2 * mainCamera.Width;
 
     // skybox
     Skybox skybox = Skybox();
@@ -490,7 +493,6 @@ int main(){
             phong_shader.setVec3("spot_light.specular", _light_spot.specular);
 
             phong_shader.setVec3("camera_pos", mainCamera.Position);
-
             phong_shader.setFloat("bloom_threshold", bloom_strength * bloom_strength);
 
             //glDisable(GL_FRAMEBUFFER_SRGB);
@@ -504,14 +506,23 @@ int main(){
             outline_shader.setFloat("line_width", 0.02f);
             outline_shader.setVec3("outline_color", glm::vec3(0.7f, 1.0f, 0.7f));
 
-            reflect_shader.use();
-            reflect_shader.setVec3("camera_pos", mainCamera.Position);
-            glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetTextureID());
+            //reflect_shader.use();
+            //reflect_shader.setVec3("camera_pos", mainCamera.Position);
+            //glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetTextureID());
 
-            refract_shader.use();
-            refract_shader.setVec3("camera_pos", mainCamera.Position);
-            glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetTextureID());
+            //refract_shader.use();
+            //refract_shader.setVec3("camera_pos", mainCamera.Position);
+            //glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetTextureID());
             
+            pbr_shader.use();
+            pbr_shader.setFloat("dir_light.power", _light_dir.Power);
+            pbr_shader.setVec3("dir_light.dir", _light_dir.GetDirection());
+            pbr_shader.setVec3("dir_light.color", _light_dir.diffuse);
+            pbr_shader.setVec3("albedo", glm::vec3(0.0f,1.0f,0.2f));
+            pbr_shader.setVec3("camera_pos", mainCamera.Position);
+            pbr_shader.setVec3("camera_dir", mainCamera.Front);
+            pbr_shader.setFloat("bloom_threshold", bloom_strength * bloom_strength);
+
 
             // meshes that may draw outline
             {
@@ -523,8 +534,21 @@ int main(){
                 //main_model.Draw(reflect_shader, mainCamera);
                 //main_model.Draw(refract_shader, mainCamera);
 
-                a_sphere.Draw(phong_shader, mainCamera);
 
+                for (int i = 0; i < 5; ++i) {
+                    for (int j = 0; j < 5; ++j) {
+                        
+                        glm::mat4 model_trans = glm::translate(glm::mat4(1.0f), glm::vec3(float(i*3 - 6.0f), float(j*3 - 6.0f), 0.0f));
+                        a_sphere.transform = model_trans;
+
+                        pbr_shader.setFloat("roughness", i * 0.25f);
+                        pbr_shader.setFloat("metallic", j * 0.25f);
+
+                        //a_sphere.Draw(phong_shader, mainCamera);
+                        a_sphere.Draw(pbr_shader, mainCamera);
+
+                    }
+                }
 
                 glStencilMask(0x00);
             }
@@ -534,16 +558,16 @@ int main(){
 
                 //floor.Draw(phong_shader, mainCamera);
 
-                _light_point.Draw(mainCamera);
-                _light_dir.Draw(mainCamera);
-                _light_spot.Draw(mainCamera);
+                //_light_point.Draw(mainCamera);
+                //_light_dir.Draw(mainCamera);
+                //_light_spot.Draw(mainCamera);
             }
 
             //skybox
             {
-                //glDepthFunc(GL_LEQUAL);
+                glDepthFunc(GL_LEQUAL);
                 //skybox.Draw(mainCamera);
-                //glDepthFunc(GL_LESS);
+                glDepthFunc(GL_LESS);
             }
 
 
