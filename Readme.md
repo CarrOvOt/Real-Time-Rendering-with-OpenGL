@@ -758,3 +758,6 @@ PS：cmftStudio导出预滤波环境贴图（pre-filtered environment map）时�
 
 [深入理解 PBR/基于图像照明 (IBL) - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/66518450)
 
+HDR素材：
+
+[NoEmotion HDRs](http://noemotionhdrs.net/hdrevening.html)

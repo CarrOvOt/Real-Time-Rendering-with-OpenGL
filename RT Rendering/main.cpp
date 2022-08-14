@@ -406,11 +406,11 @@ int main(){
 
 
     // pbr
-    unsigned int envCubemap = LatLong2CubefromFile("C:/Users/96904/Desktop/1/output_skybox.hdr",2048);
+    unsigned int envCubemap = LatLong2CubefromFile("Resource/IBL/output_skybox.hdr",2048);
     skybox.SetTextureID(envCubemap);
 
-    unsigned int preFilteredCubemap = LatLong2CubefromFile("C:/Users/96904/Desktop/1/output_pmrem.hdr", 512);
-    unsigned int irradianceCubemap = LatLong2CubefromFile("C:/Users/96904/Desktop/1/output_iem.hdr", 512);
+    unsigned int preFilteredCubemap = LatLong2CubefromFile("Resource/IBL/output_pmrem.hdr", 512);
+    unsigned int irradianceCubemap = LatLong2CubefromFile("Resource/IBL/output_iem.hdr", 512);
     unsigned int brdfLut = LoadBrdfLut();
 
 
