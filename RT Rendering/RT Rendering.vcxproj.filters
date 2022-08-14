@@ -1173,6 +1173,9 @@
     <ClInclude Include="skybox.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="utility\IBL.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\GLAD\src\glad.c">
@@ -1698,6 +1701,8 @@
     <None Include="Shaders\Postprocess\gaussianBlur.vert" />
     <None Include="Shaders\PBR.frag" />
     <None Include="Shaders\PBR.vert" />
+    <None Include="utility\UtilityShaders\LatLongToCube.vert" />
+    <None Include="utility\UtilityShaders\LatLongToCube.frag" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\GLFW\lib\glfw3.lib" />

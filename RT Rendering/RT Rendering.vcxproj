@@ -518,6 +518,7 @@
     <ClInclude Include="shader.h" />
     <ClInclude Include="simpleMesh.h" />
     <ClInclude Include="skybox.h" />
+    <ClInclude Include="utility\IBL.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
@@ -717,6 +718,8 @@
     <None Include="Shaders\pure.frag" />
     <None Include="Shaders\pure.vert" />
     <None Include="Shaders\Phong.vert" />
+    <None Include="utility\UtilityShaders\LatLongToCube.frag" />
+    <None Include="utility\UtilityShaders\LatLongToCube.vert" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\Assimp\lib\assimp-vc143-mtd.lib" />

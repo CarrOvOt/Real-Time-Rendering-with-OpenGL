@@ -35,6 +35,11 @@ uniform vec3  albedo; // color
 uniform float roughness;
 uniform float metallic;
 
+// IBL
+uniform samplerCube irradianceMap;
+uniform samplerCube prefilterMap;
+uniform sampler2D brdfLUT;
+
 
 float PI = 3.14159265359f;
 
@@ -68,14 +73,25 @@ float GSmith(vec3 l, vec3 n, vec3 v,float alpha){
     return GSchlickGGX(n,l,k)*GSchlickGGX(n,v,k);
 }
 
+vec3 KD_star(vec3 v, vec3 n, vec3 f0, float alpha, float m){
+
+    float vn=max(dot(v, n), 0.0);
+    vec3 fr = f0 + (max(vec3(1-alpha),f0)-f0)*pow(1-vn,5);
+
+    return (1-fr)*(1-m);
+}
+
 void main(){
     
     vec3 norm = normalize(VertNormal);
     vec3 light_dir = - normalize(dir_light.dir); // directed light
-    //vec3 view_dir = normalize(camera_pos-VertPos);
-    vec3 view_dir = normalize(-camera_dir); // use this if camera is orthogonal
+    vec3 view_dir = normalize(camera_pos-VertPos);
+    //vec3 view_dir = normalize(-camera_dir); // use this if camera is orthogonal
     vec3 halfway_dir = normalize(light_dir+view_dir);
+    vec3 reflect_view = reflect(-view_dir,norm);
 
+
+    // direct light
     vec3 radiance = dir_light.color * dir_light.power * dot(norm ,light_dir);
 
     vec3 F0 = mix(vec3(0.04f), albedo, metallic);
@@ -88,6 +104,15 @@ void main(){
     vec3 specular = D*F*G/(4*max(dot(norm,light_dir),0.0001)*max(dot(norm,view_dir),0.0001));
 
     FragColor = vec4((diffuse + specular) * radiance,1.0);
+
+    // IBL
+    vec3 diffuse_ibl = KD_star(view_dir,norm,F0,roughness,metallic) * albedo / PI * texture(irradianceMap,norm).rgb;
+
+    vec4 lut_val = texture(brdfLUT,vec2(max(dot(norm, view_dir), 0.0), roughness));
+    vec3 specular_ibl = textureLod(prefilterMap, reflect_view, roughness * 9.0f).rgb * (F0 * lut_val.r + lut_val.g);
+
+    FragColor = FragColor + vec4(diffuse_ibl + specular_ibl,1.0);
+
 
     float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
     if(brightness > bloom_threshold)

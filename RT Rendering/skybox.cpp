@@ -108,6 +108,10 @@ unsigned int Skybox::GetTextureID(){
     return texture;
 }
 
+void Skybox::SetTextureID(unsigned int id){
+    this->texture = id;
+}
+
 
 
 unsigned int Skybox::loadCubemap(std::string path){

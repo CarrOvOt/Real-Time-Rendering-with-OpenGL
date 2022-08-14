@@ -23,6 +23,7 @@ public:
 
 	
 	unsigned int GetTextureID();
+	void SetTextureID(unsigned int id);
 
 private:
 

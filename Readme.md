@@ -731,3 +731,30 @@ PBR相关的教程比较多了，但是还是自己稍微写了一下这样理�
 [理论 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/07 PBR/01 Theory/)
 
 [如何在Unity中造一个PBR Shader轮子 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/68025039)
+
+
+
+### ver2.1
+
+**PBR - 间接光照（环境光）**
+
+目前正交相机不能正确显示skybox，所以我们还是回到透视相机（记得修改着色器中的视线方向）。
+
+同样的一点说明：[PBR的一个简单实现 - 间接光照](./documents/PBR-IBL.md)
+
+PS：cmftStudio导出预滤波环境贴图（pre-filtered environment map）时只能导出LOD=0（也就是粗糙度为0的贴图），现在为了快速得到一个结果我们直接使用openGL的glGenerateMipmap生成其他LOD的贴图，这个效果在粗糙度较高时是**非常非常差**的。原因很简单，我们将Equirectangular Map转化为Cube Map时是分别渲染6个方向的结果，直接使用glGenerateMipmap只会分别在6个方向进行下采样，而正确的预滤波环境贴图会从全部的方向上采样，不会出现这样的边界。后续我们再研究如何得到正确的预滤波环境贴图（可能还是需要手动写代码完成这些贴图的预计算）。
+
+![image-20220814145811813](MDImages/image-20220814145811813.png)
+
+左：粗糙度为0；下：金属度为0；右：粗糙度为1；上：金属度为1；
+
+
+
+参考资料：
+
+[漫反射辐照 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/07 PBR/03 IBL/01 Diffuse irradiance/#_1)
+
+[镜面IBL - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/07 PBR/03 IBL/02 Specular IBL/)
+
+[深入理解 PBR/基于图像照明 (IBL) - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/66518450)
+

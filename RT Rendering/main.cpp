@@ -21,6 +21,8 @@
 #include "light.h"
 #include "skybox.h"
 
+#include "utility/IBL.h"
+
 // others
 #include <iostream>
 #include <string>
@@ -279,13 +281,12 @@ int main(){
     mainCamera.Move(CAMERAMOVE::BACKWARD, 8.0f);
     //mainCamera.Roate(0, 90.0f);
     //mainCamera.Far = 50.0f;
-    mainCamera.type = CAMERATYPE::ORTHO;
-    mainCamera.Height = 2.2 * mainCamera.Height;
-    mainCamera.Width = 2.2 * mainCamera.Width;
+    //mainCamera.type = CAMERATYPE::ORTHO;
+    //mainCamera.Height = 2.2 * mainCamera.Height;
+    //mainCamera.Width = 2.2 * mainCamera.Width;
 
     // skybox
     Skybox skybox = Skybox();
-
 
 
     // screen buffer
@@ -397,8 +398,6 @@ int main(){
     Shader shaderBlur = Shader("Shaders/Postprocess/gaussianBlur.vert", "Shaders/Postprocess/gaussianBlur.frag");
 
 
-
-
     // screen mesh and shader
     SimpleMesh screen_mesh = SimpleMesh(SHAPE::RECT);
     screen_mesh.RemoveTextures();
@@ -406,8 +405,21 @@ int main(){
     //Shader screen_shader = Shader("Shaders/Postprocess/kernal.vert", "Shaders/Postprocess/kernal.frag");
 
 
+    // pbr
+    unsigned int envCubemap = LatLong2CubefromFile("C:/Users/96904/Desktop/1/output_skybox.hdr",2048);
+    skybox.SetTextureID(envCubemap);
+
+    unsigned int preFilteredCubemap = LatLong2CubefromFile("C:/Users/96904/Desktop/1/output_pmrem.hdr", 512);
+    unsigned int irradianceCubemap = LatLong2CubefromFile("C:/Users/96904/Desktop/1/output_iem.hdr", 512);
+    unsigned int brdfLut = LoadBrdfLut();
+
+
+
+
     // rendering loop
     while (!glfwWindowShouldClose(window)){
+
+        glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
         // timing
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -523,6 +535,17 @@ int main(){
             pbr_shader.setVec3("camera_dir", mainCamera.Front);
             pbr_shader.setFloat("bloom_threshold", bloom_strength * bloom_strength);
 
+            glActiveTexture(GL_TEXTURE4);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceCubemap);
+            pbr_shader.setInt("irradianceMap", 4);
+
+            glActiveTexture(GL_TEXTURE5);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, preFilteredCubemap);
+            pbr_shader.setInt("prefilterMap", 5);
+
+            glActiveTexture(GL_TEXTURE6);
+            glBindTexture(GL_TEXTURE_2D, brdfLut);
+            pbr_shader.setInt("brdfLUT", 6);
 
             // meshes that may draw outline
             {
@@ -555,7 +578,6 @@ int main(){
 
             // meshes that never draw outline
             {
-
                 //floor.Draw(phong_shader, mainCamera);
 
                 //_light_point.Draw(mainCamera);
@@ -566,7 +588,7 @@ int main(){
             //skybox
             {
                 glDepthFunc(GL_LEQUAL);
-                //skybox.Draw(mainCamera);
+                skybox.Draw(mainCamera);
                 glDepthFunc(GL_LESS);
             }
 
@@ -615,7 +637,7 @@ int main(){
                 glBindFramebuffer(GL_READ_FRAMEBUFFER, pingpongFBO[0]);
                 glBindFramebuffer(GL_DRAW_FRAMEBUFFER, pingpongFBO[1]);
 
-                glActiveTexture(0);
+                glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, first_iteration ? screenBloomTexture : pingpongBuffer[0]);
                 shaderBlur.setBool("horizontal", true);
                 rect.Draw(shaderBlur);
@@ -623,7 +645,7 @@ int main(){
                 glBindFramebuffer(GL_READ_FRAMEBUFFER, pingpongFBO[1]);
                 glBindFramebuffer(GL_DRAW_FRAMEBUFFER, pingpongFBO[0]);
 
-                glActiveTexture(0);
+                glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, pingpongBuffer[1]);
                 shaderBlur.setBool("horizontal", false);
                 rect.Draw(shaderBlur);
