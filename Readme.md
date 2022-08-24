@@ -2,7 +2,13 @@
 
 在window环境下使用openGL学习实时渲染相关的各种基础/算法/实现/技巧等。。。
 
-&nbsp;
+---
+
+Latest：PBR环境光
+
+![image-20220822233812140](MDImages/image-20220822233812140.png)
+
+---
 
 一些LearnOpenGL教程里没有的东西&一些自己的理解：
 
@@ -17,6 +23,10 @@
 [Nsight Graphics的简单使用](./documents/NsightGraphics-usage.md)
 
 [PBR的一个简单实现 - 直接光照](./documents/PBR-direct-light.md)
+
+[PBR的一个简单实现 - 间接光照](./documents/PBR-IBL.md)
+
+---
 
 ### ver0.1
 
@@ -761,3 +771,46 @@ PS：cmftStudio导出预滤波环境贴图（pre-filtered environment map）时�
 HDR素材：
 
 [NoEmotion HDRs](http://noemotionhdrs.net/hdrevening.html)
+
+
+
+### ver2.2
+
+**PBR - 整理代码**
+
+上一节中的图还有一点小bug，每个球中心会有一个奇怪的圆圈，这是因为使用的BRDF LUT的图片有点问题，所以我们还是自己积分生成一下，再加上辐照度图（irradiance map），预滤波环境贴图（pre-filtered environment map），我们需要写3个着色器来生成这些贴图，因为涉及到积分公式的推导、通过采样进行积分求解、和随机采样序列的生成，这些我也还没完全弄懂，所以着色器代码直接复制粘贴[LearnOpenGL](https://learnopengl.com/code_viewer_gh.php?code=src/6.pbr/2.2.1.ibl_specular/ibl_specular.cpp)的，暂时也不进行讲解。
+
+![image-20220822234055003](MDImages/image-20220822234055003.png)
+
+然后我们加入各种贴图，还有点光源和聚光的PBR。gltf的模型中金属度和粗糙度存放在同一张贴图中，G通道为粗糙度，B通道为金属度。
+
+![image-20220822233812140](MDImages/image-20220822233812140.png)
+
+效果还不错，但是移动摄像机的时候高光部分会闪烁，特别是在高光较多的场景中：
+
+![pbr_light_flash](MDImages/pbr_light_flash.gif)
+
+这个可能是着色走样和时间走样导致的，之后再研究相关的解决方案。
+
+
+
+参考资料：
+
+[Code Viewer. Source code: src/6.pbr/2.2.1.ibl_specular/ibl_specular.cpp (learnopengl.com)](https://learnopengl.com/code_viewer_gh.php?code=src/6.pbr/2.2.1.ibl_specular/ibl_specular.cpp)
+
+[gltf 2.0快速入门_万里归来少年心的博客-CSDN博客_gltf](https://blog.csdn.net/liyazhen2011/article/details/122251538)
+
+[漫反射辐照 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/07 PBR/03 IBL/01 Diffuse irradiance/#_1)
+
+[镜面IBL - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/07 PBR/03 IBL/02 Specular IBL/)
+
+[深入理解 PBR/基于图像照明 (IBL) - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/66518450)
+
+[深入剖析MSAA - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/32823370)
+
+HDR素材：
+
+[NoEmotion HDRs](http://noemotionhdrs.net/hdrevening.html)
+
+http://www.hdrlabs.com/sibl/archive.html
+

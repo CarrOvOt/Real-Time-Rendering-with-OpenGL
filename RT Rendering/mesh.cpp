@@ -21,7 +21,7 @@ void Mesh::Draw(Shader& shader, Camera& camera, glm::mat4 parent_trans){
     shader.setMat4("proj_sp", camera.GetProjMatrix());
 
 	// bind textures
-	unsigned int diffuseNr = 1, specularNr = 1, noramlNr = 1;
+	unsigned int diffuseNr = 1, specularNr = 1, normalNr = 1, metallicNr = 1, roughNr = 1;
 
 	for (unsigned int i = 0; i < Textures.size(); ++i) {
 		glActiveTexture(GL_TEXTURE0 + i);
@@ -33,7 +33,13 @@ void Mesh::Draw(Shader& shader, Camera& camera, glm::mat4 parent_trans){
             name = "texture_specular" + std::to_string(specularNr++);
         }
         if (Textures[i].type == NORMAL) {
-            name = "texture_normal" + std::to_string(noramlNr++);
+            name = "texture_normal" + std::to_string(normalNr++);
+        }
+        if (Textures[i].type == METALLIC) {
+            name = "texture_metallic" + std::to_string(metallicNr++);
+        }
+        if (Textures[i].type == ROUGHNESS) {
+            name = "texture_roughness" + std::to_string(roughNr++);
         }
 		shader.setInt(name.c_str(), i);
 		glBindTexture(GL_TEXTURE_2D, Textures[i].id);

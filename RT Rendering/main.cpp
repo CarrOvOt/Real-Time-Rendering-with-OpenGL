@@ -273,7 +273,8 @@ int main(){
     Shader outline_shader = Shader("Shaders/Effect/outlining.vert", "Shaders/Effect/outlining.frag");
     //Shader reflect_shader = Shader("Shaders/Effect/reflect.vert", "Shaders/Effect/reflect.frag");
     //Shader refract_shader = Shader("Shaders/Effect/refract.vert", "Shaders/Effect/refract.frag");
-    Shader pbr_shader = Shader("Shaders/PBR.vert", "Shaders/PBR.frag");
+    //Shader pbr_shader = Shader("Shaders/PBR.vert", "Shaders/PBR.frag");
+    Shader pbr_shader = Shader("Shaders/PBR_Texture.vert", "Shaders/PBR_Texture.frag");
 
 
     // cameras
@@ -281,6 +282,7 @@ int main(){
     mainCamera.Move(CAMERAMOVE::BACKWARD, 8.0f);
     //mainCamera.Roate(0, 90.0f);
     //mainCamera.Far = 50.0f;
+    //mainCamera.Near = 1.0f;
     //mainCamera.type = CAMERATYPE::ORTHO;
     //mainCamera.Height = 2.2 * mainCamera.Height;
     //mainCamera.Width = 2.2 * mainCamera.Width;
@@ -406,15 +408,12 @@ int main(){
 
 
     // pbr
-    unsigned int envCubemap = LatLong2CubefromFile("Resource/IBL/output_skybox.hdr",2048);
+    unsigned int envCubemap = LatLong2CubefromFile("Resource/IBL/PaperMill_Ruins_E/PaperMill_E_3k.hdr", 2048);
+    //unsigned int envCubemap = LatLong2CubefromFile("Resource/IBL/output_skybox.hdr",2048);
     skybox.SetTextureID(envCubemap);
-
-    unsigned int preFilteredCubemap = LatLong2CubefromFile("Resource/IBL/output_pmrem.hdr", 512);
-    unsigned int irradianceCubemap = LatLong2CubefromFile("Resource/IBL/output_iem.hdr", 512);
-    unsigned int brdfLut = LoadBrdfLut();
-
-
-
+    unsigned int preFilteredCubemap = PrefilterMapfromEnvCube(envCubemap);
+    unsigned int irradianceCubemap = GenIrradiance(envCubemap);
+    unsigned int brdfLut = GenBrdfLut();
 
     // rendering loop
     while (!glfwWindowShouldClose(window)){
@@ -435,7 +434,6 @@ int main(){
         model_sp = glm::translate(glm::mat4(1.0f), glm::vec3(trans_x, 0.0f, 0.0f))* model_sp;
 
         main_model.transform = model_sp;
-
 
 
         _light_point.Transform = glm::translate(glm::mat4(1.0f), light_point_pos);
@@ -527,9 +525,20 @@ int main(){
             //glBindTexture(GL_TEXTURE_CUBE_MAP, skybox.GetTextureID());
             
             pbr_shader.use();
+
+            pbr_shader.setFloat("point_light.power", _light_point.Power);
+            pbr_shader.setVec3("point_light.pos", glm::vec3(_light_point.Transform[3][0], _light_point.Transform[3][1], _light_point.Transform[3][2]));
+            pbr_shader.setVec3("point_light.color", _light_point.diffuse);
             pbr_shader.setFloat("dir_light.power", _light_dir.Power);
             pbr_shader.setVec3("dir_light.dir", _light_dir.GetDirection());
             pbr_shader.setVec3("dir_light.color", _light_dir.diffuse);
+            pbr_shader.setFloat("spot_light.power", _light_spot.Power);
+            pbr_shader.setVec3("spot_light.pos", glm::vec3(_light_spot.Transform[3][0], _light_spot.Transform[3][1], _light_spot.Transform[3][2]));
+            pbr_shader.setVec3("spot_light.dir", _light_spot.GetDirection());
+            pbr_shader.setFloat("spot_light.cosR1", glm::cos(glm::radians(_light_spot.R1)));
+            pbr_shader.setFloat("spot_light.cosR2", glm::cos(glm::radians(_light_spot.R2)));
+            pbr_shader.setVec3("spot_light.color", _light_spot.diffuse);
+
             pbr_shader.setVec3("albedo", glm::vec3(0.0f,1.0f,0.2f));
             pbr_shader.setVec3("camera_pos", mainCamera.Position);
             pbr_shader.setVec3("camera_dir", mainCamera.Front);
@@ -556,22 +565,18 @@ int main(){
                 //main_model.Draw(phong_shader, mainCamera);
                 //main_model.Draw(reflect_shader, mainCamera);
                 //main_model.Draw(refract_shader, mainCamera);
+                main_model.Draw(pbr_shader, mainCamera);
 
-
-                for (int i = 0; i < 5; ++i) {
-                    for (int j = 0; j < 5; ++j) {
-                        
-                        glm::mat4 model_trans = glm::translate(glm::mat4(1.0f), glm::vec3(float(i*3 - 6.0f), float(j*3 - 6.0f), 0.0f));
-                        a_sphere.transform = model_trans;
-
-                        pbr_shader.setFloat("roughness", i * 0.25f);
-                        pbr_shader.setFloat("metallic", j * 0.25f);
-
-                        //a_sphere.Draw(phong_shader, mainCamera);
-                        a_sphere.Draw(pbr_shader, mainCamera);
-
-                    }
-                }
+                //for (int i = 0; i < 5; ++i) {
+                //    for (int j = 0; j < 5; ++j) {    
+                //        glm::mat4 model_trans = glm::translate(glm::mat4(1.0f), glm::vec3(float(i*3 - 6.0f), float(j*3 - 6.0f), 0.0f));
+                //        a_sphere.transform = model_trans;
+                //        pbr_shader.setFloat("roughness", i * 0.25f);
+                //        pbr_shader.setFloat("metallic", j * 0.25f);
+                //        //a_sphere.Draw(phong_shader, mainCamera);
+                //        a_sphere.Draw(pbr_shader, mainCamera);
+                //    }
+                //}
 
                 glStencilMask(0x00);
             }

@@ -20,7 +20,9 @@ enum TEXTURE_TYPE {
 	DIFFUSE,
 	SPECULAR,
 	NORMAL,
-	HEIGHT
+	HEIGHT,
+	METALLIC,
+	ROUGHNESS
 };
 
 struct Vertex {

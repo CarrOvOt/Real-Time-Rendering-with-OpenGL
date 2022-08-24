@@ -1703,6 +1703,14 @@
     <None Include="Shaders\PBR.vert" />
     <None Include="utility\UtilityShaders\LatLongToCube.vert" />
     <None Include="utility\UtilityShaders\LatLongToCube.frag" />
+    <None Include="utility\UtilityShaders\prefilter.frag" />
+    <None Include="utility\UtilityShaders\prefilter.vert" />
+    <None Include="utility\UtilityShaders\brdf_lut.frag" />
+    <None Include="utility\UtilityShaders\brdf_lut.vert" />
+    <None Include="utility\UtilityShaders\irradiance.frag" />
+    <None Include="utility\UtilityShaders\irradiance.vert" />
+    <None Include="Shaders\PBR_Texture.frag" />
+    <None Include="Shaders\PBR_Texture.vert" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\GLFW\lib\glfw3.lib" />

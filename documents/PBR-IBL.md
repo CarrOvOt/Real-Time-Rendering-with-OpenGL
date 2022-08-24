@@ -157,6 +157,24 @@ FragColor = FragColor + vec4(diffuse_ibl + specular_ibl,1.0);
 
 
 
+### 4. 修点BUG
+
+上一节中的图还有一点小bug，每个球中心会有一个奇怪的圆圈，这是因为使用的BRDF LUT的图片有点问题，所以我们还是自己积分生成一下，再加上辐照度图（irradiance map），预滤波环境贴图（pre-filtered environment map），我们需要写3个着色器来生成这些贴图，因为涉及到积分公式的推导、通过采样进行积分求解、和随机采样序列的生成，这些我也还没完全弄懂，所以着色器代码直接复制粘贴[LearnOpenGL](https://learnopengl.com/code_viewer_gh.php?code=src/6.pbr/2.2.1.ibl_specular/ibl_specular.cpp)的，暂时也不进行讲解。
+
+![image-20220822223023370](MDImages/image-20220822223023370.png)
+
+现在效果好多了。
+
+然后加入基础颜色贴图，法线贴图，金属度和粗糙度贴图：
+
+<img src="MDImages/image-20220822224039035.png" alt="image-20220822224039035" style="zoom:50%;" /> 
+
+<img src="MDImages/image-20220822224238647.png" alt="image-20220822224238647" style="zoom:50%;" /> 
+
+<img src="MDImages/image-20220822224452486.png" alt="image-20220822224452486" style="zoom:50%;" /> 
+
+完事。
+
 
 
 参考资料：
@@ -166,4 +184,12 @@ FragColor = FragColor + vec4(diffuse_ibl + specular_ibl,1.0);
 [镜面IBL - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/07 PBR/03 IBL/02 Specular IBL/)
 
 [深入理解 PBR/基于图像照明 (IBL) - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/66518450)
+
+[Code Viewer. Source code: src/6.pbr/2.2.1.ibl_specular/ibl_specular.cpp (learnopengl.com)](https://learnopengl.com/code_viewer_gh.php?code=src/6.pbr/2.2.1.ibl_specular/ibl_specular.cpp)
+
+HDR素材：
+
+[NoEmotion HDRs](http://noemotionhdrs.net/hdrevening.html)
+
+http://www.hdrlabs.com/sibl/archive.html
 

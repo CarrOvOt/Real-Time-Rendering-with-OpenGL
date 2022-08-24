@@ -114,9 +114,16 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene){
     // 4. height maps
     std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_HEIGHT, TEXTURE_TYPE::HEIGHT);
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
-
+    // 5. emissive maps
     std::vector<Texture> emissiveMaps = loadMaterialTextures(material, aiTextureType_EMISSIVE, TEXTURE_TYPE::DIFFUSE);
     textures.insert(textures.end(), emissiveMaps.begin(), emissiveMaps.end());
+
+
+    std::vector<Texture> metallicMaps = loadMaterialTextures(material, aiTextureType_METALNESS, TEXTURE_TYPE::METALLIC);
+    textures.insert(textures.end(), metallicMaps.begin(), metallicMaps.end());
+
+    std::vector<Texture> roughnessMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE_ROUGHNESS, TEXTURE_TYPE::ROUGHNESS);
+    textures.insert(textures.end(), roughnessMaps.begin(), roughnessMaps.end());
 
     // return a mesh object created from the extracted mesh data
     return Mesh(vertices, indices, textures);

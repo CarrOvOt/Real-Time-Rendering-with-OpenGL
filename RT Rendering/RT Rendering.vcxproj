@@ -708,6 +708,8 @@
     <None Include="Shaders\Gouraud.vert" />
     <None Include="Shaders\PBR.frag" />
     <None Include="Shaders\PBR.vert" />
+    <None Include="Shaders\PBR_Texture.frag" />
+    <None Include="Shaders\PBR_Texture.vert" />
     <None Include="Shaders\Phong.frag" />
     <None Include="Shaders\Postprocess\default.frag" />
     <None Include="Shaders\Postprocess\default.vert" />
@@ -718,8 +720,14 @@
     <None Include="Shaders\pure.frag" />
     <None Include="Shaders\pure.vert" />
     <None Include="Shaders\Phong.vert" />
+    <None Include="utility\UtilityShaders\brdf_lut.frag" />
+    <None Include="utility\UtilityShaders\brdf_lut.vert" />
+    <None Include="utility\UtilityShaders\irradiance.frag" />
+    <None Include="utility\UtilityShaders\irradiance.vert" />
     <None Include="utility\UtilityShaders\LatLongToCube.frag" />
     <None Include="utility\UtilityShaders\LatLongToCube.vert" />
+    <None Include="utility\UtilityShaders\prefilter.frag" />
+    <None Include="utility\UtilityShaders\prefilter.vert" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\Assimp\lib\assimp-vc143-mtd.lib" />

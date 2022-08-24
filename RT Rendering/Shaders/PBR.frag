@@ -101,7 +101,7 @@ void main(){
     float G=GSmith(light_dir,norm,view_dir,roughness);
 
     vec3 diffuse = albedo/PI * (vec3(1.0)-F) * (1-metallic);
-    vec3 specular = D*F*G/(4*max(dot(norm,light_dir),0.0001)*max(dot(norm,view_dir),0.0001));
+    vec3 specular = D*F*G/(4*max(dot(norm,light_dir),0.00001)*max(dot(norm,view_dir),0.00001));
 
     FragColor = vec4((diffuse + specular) * radiance,1.0);
 
@@ -109,10 +109,9 @@ void main(){
     vec3 diffuse_ibl = KD_star(view_dir,norm,F0,roughness,metallic) * albedo / PI * texture(irradianceMap,norm).rgb;
 
     vec4 lut_val = texture(brdfLUT,vec2(max(dot(norm, view_dir), 0.0), roughness));
-    vec3 specular_ibl = textureLod(prefilterMap, reflect_view, roughness * 9.0f).rgb * (F0 * lut_val.r + lut_val.g);
+    vec3 specular_ibl = textureLod(prefilterMap, reflect_view, roughness * 4.0f).rgb * (F0 * lut_val.r + lut_val.g);
 
     FragColor = FragColor + vec4(diffuse_ibl + specular_ibl,1.0);
-
 
     float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
     if(brightness > bloom_threshold)
