@@ -3,6 +3,10 @@
 Model::Model(){
 }
 
+Model::Model(string file){
+    LoadModel(file);
+}
+
 Model::Model(SHAPE shape){
 	meshes.emplace_back(SimpleMesh(shape));
 }
@@ -12,6 +16,12 @@ void Model::Draw(Shader& shader, Camera& camera){
 	for (Mesh mesh : meshes) {
 		mesh.Draw(shader, camera, transform);
 	}
+}
+
+void Model::Draw(Shader& shader){
+    for (Mesh mesh : meshes) {
+        mesh.Draw(shader, transform);
+    }
 }
 
 void Model::LoadModel(string path){

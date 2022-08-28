@@ -23,9 +23,11 @@ public:
 	string directory;
 
 	Model();
+	Model(string file);
 	Model(SHAPE shape);
 
 	void Draw(Shader& shader, Camera& camera);
+	void Draw(Shader& shader);
 
 	void LoadModel(string path);
 

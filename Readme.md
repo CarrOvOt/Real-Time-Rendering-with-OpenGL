@@ -814,3 +814,11 @@ HDR素材：
 
 http://www.hdrlabs.com/sibl/archive.html
 
+
+
+### ver2.3
+
+**整理代码**
+
+下一节打算实现**延迟渲染(Deferred Rendering)**，将会和目前的渲染有一些区别，而且现在main函数有点乱了，所以这一节还是整理一下代码。创建一个ForwardRender类，保存渲染需要的各种frame buffer和texture，以及整个渲染pipeline。创建一个Scene类，保存一个场景需要的模型，天空盒，相机，Shaders，以及相应的Set，Draw函数。但是用户输入这一块（相机移动旋转，ImGUI调整参数）还是比较乱，之后再说吧。
+

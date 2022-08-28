@@ -109,7 +109,9 @@ unsigned int Skybox::GetTextureID(){
 }
 
 void Skybox::SetTextureID(unsigned int id){
+    unsigned int temp = texture;
     this->texture = id;
+    glDeleteTextures(1, &temp);
 }
 
 

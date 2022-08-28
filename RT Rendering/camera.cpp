@@ -1,5 +1,11 @@
 #include"camera.h"
 
+Camera::Camera(){
+	Height = 720;
+	Width = 1280;
+	UpdateVector();
+}
+
 Camera::Camera(float height, float width):Height(height),Width(width) {
 	UpdateVector();
 }

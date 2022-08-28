@@ -1176,6 +1176,12 @@
     <ClInclude Include="utility\IBL.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="scene.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="render.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="External\GLAD\src\glad.c">
@@ -1233,6 +1239,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="skybox.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="scene.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="render.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

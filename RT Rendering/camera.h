@@ -45,6 +45,7 @@ public:
 	float ScaleSpeed = 2.0f;
 
 
+	Camera();
 	Camera(float height,float width);
 
 
