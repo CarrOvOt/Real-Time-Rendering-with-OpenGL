@@ -1173,7 +1173,7 @@
     <ClInclude Include="skybox.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="utility\IBL.h">
+    <ClInclude Include="utility\IBL.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="scene.h">
@@ -1723,6 +1723,10 @@
     <None Include="utility\UtilityShaders\irradiance.vert" />
     <None Include="Shaders\PBR_Texture.frag" />
     <None Include="Shaders\PBR_Texture.vert" />
+    <None Include="Shaders\DeferredRender\PBR_second_pass.frag" />
+    <None Include="Shaders\DeferredRender\PBR_second_pass.vert" />
+    <None Include="Shaders\DeferredRender\PBR_first_pass.frag" />
+    <None Include="Shaders\DeferredRender\PBR_first_pass.vert" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="External\GLFW\lib\glfw3.lib" />

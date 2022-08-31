@@ -4,7 +4,9 @@
 
 ---
 
-Latest：PBR环境光
+Latest：延迟渲染，PBR
+
+![image-20220831234446503](MDImages/image-20220831234446503.png)
 
 ![image-20220822233812140](MDImages/image-20220822233812140.png)
 
@@ -821,4 +823,52 @@ http://www.hdrlabs.com/sibl/archive.html
 **整理代码**
 
 下一节打算实现**延迟渲染(Deferred Rendering)**，将会和目前的渲染有一些区别，而且现在main函数有点乱了，所以这一节还是整理一下代码。创建一个ForwardRender类，保存渲染需要的各种frame buffer和texture，以及整个渲染pipeline。创建一个Scene类，保存一个场景需要的模型，天空盒，相机，Shaders，以及相应的Set，Draw函数。但是用户输入这一块（相机移动旋转，ImGUI调整参数）还是比较乱，之后再说吧。
+
+
+
+### ver2.4
+
+**延迟渲染(Deferred Rendering)**
+
+我们基于PBR的shader来改，在second pass中，我们需要的几何信息有
+
+``` glsl
+uniform sampler2D albedo_texture;
+uniform sampler2D normal_texture;
+uniform sampler2D position_texture;
+uniform sampler2D metallic_roughness_texture;
+```
+
+在也就是我们需要的G-buffer中要存储这些数据。设置first pass要写入的颜色缓冲：
+
+``` glsl
+layout (location = 0) out vec3 albedo_texture;
+layout (location = 1) out vec3 normal_texture;
+layout (location = 2) out vec3 position_texture;
+layout (location = 3) out vec2 metallic_roughness_texture;
+```
+
+之前实现泛光效果时也用过MRT（multiple render targets）技术了，同样的用法。
+
+多注意一下shader中uniform变量的设置（比如相机的变换矩阵在first pass中被使用，相机的世界坐标和朝向在second pass中被使用）。
+
+first pass和 second pass 完成了PBR，其中光照的计算都在second pass中，所以可以节省大量的计算（需要计算光照的片段数量只和窗口大小有关）。所以其他不是PBR的渲染需要额外使用一个正向渲染（Forward Rendering），比如天空盒，光照图标，模型描边。所有这里需要使用` glBlitFramebuffer()`将first pass 的深度缓冲和模板缓冲复制过来。
+
+关于之前写IBL的工具函数会出现重定义的问题：[h文件和.hpp区别_滥竽充数的博士的博客-CSDN博客](https://blog.csdn.net/yjQ5213/article/details/125254070)，将这些工具函数封装为静态方法即可。
+
+![image-20220831234446503](MDImages/image-20220831234446503.png)
+
+这个场景包含了50个小机器人和32个点光源，使用延迟渲染帧率在90帧左右，前向渲染83帧左右。
+
+
+
+参考资料：
+
+[延迟着色法 - LearnOpenGL CN (learnopengl-cn.github.io)](https://learnopengl-cn.github.io/05 Advanced Lighting/08 Deferred Shading/)
+
+[延迟渲染与MSAA的那些事 - 知乎 (zhihu.com)](https://zhuanlan.zhihu.com/p/135444145)
+
+模型资源：
+
+[Small flying droïd - Download Free 3D model by MisterH](https://sketchfab.com/3d-models/small-flying-droid-b30d5511b4f2414b96d67a5608ef641c)
 

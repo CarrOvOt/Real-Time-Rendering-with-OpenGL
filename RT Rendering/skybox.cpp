@@ -1,4 +1,5 @@
 #include "skybox.h"
+#include "utility/IBL.hpp"
 
 static float SkyboxVertices[] = {
     // positions          
@@ -55,8 +56,6 @@ static std::vector<std::string> Faces{
 };
 
 
-
-
 Skybox::Skybox(){
 
 	// bind vertices
@@ -71,16 +70,16 @@ Skybox::Skybox(){
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	}
 	
-    texture = loadCubemap("Resource/Skybox/");
-    shader = Shader("Shaders/BasicShader/skyboxDraw.vert", "Shaders/BasicShader/skyboxDraw.frag");
+    this->texture = loadCubemap("Resource/Skybox/");
+    this->shader = Shader("Shaders/BasicShader/skyboxDraw.vert", "Shaders/BasicShader/skyboxDraw.frag");
 
 }
 
-Skybox::Skybox(std::string path){
+Skybox::Skybox(std::string path, bool hdr) : Skybox{} {
 
-    Skybox::Skybox();
-    ReloadCubemap(path);
-
+    if(!hdr) ReloadCubemap(path);
+    else SetTextureID(IBLUtility::LatLong2CubefromFile(path.c_str()));
+   
 }
 
 void Skybox::Draw(Camera& camera){

@@ -50,9 +50,9 @@ public:
 	void setIBL();
 
 	// set uniform vars in shader
-	void setShaderLight();
-	void setShaderCamera();
-	void setShaderEnv();
+	void setShaderLight(Shader& shader);
+	void setShaderCamera(Shader& shader);
+	void setShaderEnv(Shader& shader);
 	void setShaderOutline();
 
 	// draw model, lights sign, skybox, outlines

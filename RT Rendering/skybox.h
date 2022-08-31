@@ -15,7 +15,7 @@ class Skybox {
 public:
 
 	Skybox();
-    Skybox(std::string path);
+    Skybox(std::string path, bool hdr);
 
 	void Draw(Camera& camera);
 

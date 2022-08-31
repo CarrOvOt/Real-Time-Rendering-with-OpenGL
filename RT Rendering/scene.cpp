@@ -1,63 +1,69 @@
 #include "scene.h"
-#include "utility/IBL.h"
+#include "utility/IBL.hpp"
 
+void Scene::setIBL() {
 
-void Scene::setShaderLight(){
+    this->preFilteredCubemap = IBLUtility::PrefilterMapfromEnvCube(this->mainSkybox.GetTextureID());
+    this->irradianceCubemap = IBLUtility::GenIrradiance(this->mainSkybox.GetTextureID());
+    this->brdfLut = IBLUtility::GenBrdfLut();
+}
 
-    mainShader.use();
+void Scene::setShaderLight(Shader& shader){
 
-    mainShader.setFloat("point_light.power", PointLights[0].Power);
-    mainShader.setVec3("point_light.pos", glm::vec3(PointLights[0].Transform[3]));
-    mainShader.setVec3("point_light.color", PointLights[0].diffuse);
-    
-    mainShader.setFloat("dir_light.power", DirLights[0].Power);
-    mainShader.setVec3("dir_light.dir", DirLights[0].GetDirection());
-    mainShader.setVec3("dir_light.color", DirLights[0].diffuse);
-    
-    mainShader.setFloat("spot_light.power", SpotLights[0].Power);
-    mainShader.setVec3("spot_light.pos", glm::vec3(SpotLights[0].Transform[3]));
-    mainShader.setVec3("spot_light.dir", SpotLights[0].GetDirection());
-    mainShader.setFloat("spot_light.cosR1", glm::cos(glm::radians(SpotLights[0].R1)));
-    mainShader.setFloat("spot_light.cosR2", glm::cos(glm::radians(SpotLights[0].R2)));
-    mainShader.setVec3("spot_light.color", SpotLights[0].diffuse);
+    shader.use();
+
+    for (int i = 0; i < PointLights.size(); ++i) {
+        shader.setFloat("point_light[" + std::to_string(i) + "].power", PointLights[i].Power);
+        shader.setVec3("point_light[" + std::to_string(i) + "].pos", glm::vec3(PointLights[i].Transform[3]));
+        shader.setVec3("point_light[" + std::to_string(i) + "].color", PointLights[i].diffuse);
+    }
+
+    for (int i = 0; i < DirLights.size(); ++i) {
+        shader.setFloat("dir_light[" + std::to_string(i) + "].power", DirLights[i].Power);
+        shader.setVec3("dir_light[" + std::to_string(i) + "].dir", DirLights[i].GetDirection());
+        shader.setVec3("dir_light[" + std::to_string(i) + "].color", DirLights[i].diffuse);
+    }
+
+    for (int i = 0; i < SpotLights.size(); ++i) {
+        shader.setFloat("spot_light[" + std::to_string(i) + "].power", SpotLights[i].Power);
+        shader.setVec3("spot_light[" + std::to_string(i) + "].pos", glm::vec3(SpotLights[i].Transform[3]));
+        shader.setVec3("spot_light[" + std::to_string(i) + "].dir", SpotLights[i].GetDirection());
+        shader.setFloat("spot_light[" + std::to_string(i) + "].cosR1", glm::cos(glm::radians(SpotLights[i].R1)));
+        shader.setFloat("spot_light[" + std::to_string(i) + "].cosR2", glm::cos(glm::radians(SpotLights[i].R2)));
+        shader.setVec3("spot_light[" + std::to_string(i) + "].color", SpotLights[i].diffuse);
+    }
 
 }
 
-void Scene::setShaderCamera(){
+void Scene::setShaderCamera(Shader& shader){
 
-    mainShader.use();
+    shader.use();
 
-    mainShader.setMat4("view_sp", this->mainCamera.GetViewMatrix());
-    mainShader.setMat4("proj_sp", this->mainCamera.GetProjMatrix());
-    mainShader.setVec3("camera_pos", this->mainCamera.Position);
-    mainShader.setVec3("camera_dir", this->mainCamera.Front);
+    shader.setMat4("view_sp", this->mainCamera.GetViewMatrix());
+    shader.setMat4("proj_sp", this->mainCamera.GetProjMatrix());
+    shader.setVec3("camera_pos", this->mainCamera.Position);
+    shader.setVec3("camera_dir", this->mainCamera.Front);
 
 }
 
-void Scene::setIBL(){
 
-    this->preFilteredCubemap = PrefilterMapfromEnvCube(this->mainSkybox.GetTextureID());
-    this->irradianceCubemap = GenIrradiance(this->mainSkybox.GetTextureID());
-    this->brdfLut = GenBrdfLut();
-}
+void Scene::setShaderEnv(Shader& shader){
 
-void Scene::setShaderEnv(){
-
-    unsigned int irNr = 4;
-    unsigned int preNr = 5;
-    unsigned int brdfNr = 6;
+    unsigned int irNr = 5;
+    unsigned int preNr = irNr +1;
+    unsigned int brdfNr = irNr+2;
 
     glActiveTexture(GL_TEXTURE0 + irNr);
     glBindTexture(GL_TEXTURE_CUBE_MAP, this->irradianceCubemap);
-    mainShader.setInt("irradianceMap", irNr);
+    shader.setInt("irradianceMap", irNr);
 
     glActiveTexture(GL_TEXTURE0 + preNr);
     glBindTexture(GL_TEXTURE_CUBE_MAP, this->preFilteredCubemap);
-    mainShader.setInt("prefilterMap", preNr);
+    shader.setInt("prefilterMap", preNr);
 
     glActiveTexture(GL_TEXTURE0 + brdfNr);
     glBindTexture(GL_TEXTURE_2D, this->brdfLut);
-    mainShader.setInt("brdfLUT", brdfNr);
+    shader.setInt("brdfLUT", brdfNr);
 }
 
 void Scene::setShaderOutline() {
@@ -78,9 +84,16 @@ void Scene::Draw(){
 }
 
 void Scene::DrawLights(){
-    SpotLights[0].Draw(this->mainCamera);
-    DirLights[0].Draw(this->mainCamera);
-    PointLights[0].Draw(this->mainCamera);
+    for (int i = 0; i < PointLights.size(); ++i) {
+        PointLights[i].Draw(this->mainCamera);
+    }
+    for (int i = 0; i < SpotLights.size(); ++i) {
+        SpotLights[i].Draw(this->mainCamera);
+    }
+    for (int i = 0; i < DirLights.size(); ++i) {
+        DirLights[i].Draw(this->mainCamera);
+    }
+    
 }
 
 void Scene::DrawSkybox(){

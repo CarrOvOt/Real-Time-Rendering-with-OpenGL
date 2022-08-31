@@ -1,5 +1,6 @@
 #version 330 core
 
+
 struct Light{
     vec3 pos;   // used for point light and spot light
     vec3 dir;   // used for directed light and spot light
@@ -10,36 +11,26 @@ struct Light{
     vec3 color;
 };
 
-
 layout (location = 0) out vec4 FragColor;
 layout (location = 1) out vec4 BloomColor;
 
-in vec3 VertPos;
-in vec3 VertNormal;
 in vec2 VertTexCoord;
-in mat3 TBN;
 
-// direct light
-const int LightNR = 32;
-uniform Light point_light[LightNR];
-uniform Light dir_light[LightNR];
-uniform Light spot_light[LightNR];
-
-uniform sampler2D texture_diffuse1;
-uniform sampler2D texture_specular1;
-uniform sampler2D texture_normal1;
-uniform sampler2D texture_metallic1;
-uniform sampler2D texture_roughness1;
-
+uniform sampler2D albedo_texture;
+uniform sampler2D normal_texture;
+uniform sampler2D position_texture;
+uniform sampler2D metallic_roughness_texture;
 
 uniform vec3 camera_pos;
 uniform vec3 camera_dir;
 
 const float bloom_threshold=1.0f;
 
-//uniform vec3  albedo; // color
-//uniform float roughness;
-//uniform float metallic;
+// direct light
+const int LightNR = 32;
+uniform Light point_light[LightNR];
+uniform Light dir_light[LightNR];
+uniform Light spot_light[LightNR];
 
 // IBL
 uniform samplerCube irradianceMap;
@@ -102,10 +93,10 @@ vec3 PBR_directed_light(Light light, vec3 view_dir, vec3 norm, vec3 albedo, vec3
 
     vec3 radiance = light.color * light.power * dot(norm ,light_dir);
 
-    return max((diffuse + specular) * radiance, 0.0f);
+    return max((diffuse + specular) * radiance,0.0f);
 }
 
-vec3 PBR_point_light(Light light, vec3 view_dir, vec3 norm,vec3 albedo,vec3 F0,float metallic,float roughness){
+vec3 PBR_point_light(vec3 VertPos,Light light, vec3 view_dir, vec3 norm,vec3 albedo,vec3 F0,float metallic,float roughness){
 
     vec3 light_dir = normalize(light.pos - VertPos);
     vec3 halfway_dir = normalize(light_dir + view_dir);
@@ -125,7 +116,7 @@ vec3 PBR_point_light(Light light, vec3 view_dir, vec3 norm,vec3 albedo,vec3 F0,f
     return (diffuse + specular) * radiance;
 }
 
-vec3 PBR_spot_light(Light light, vec3 view_dir, vec3 norm,vec3 albedo,vec3 F0,float metallic,float roughness){
+vec3 PBR_spot_light(vec3 VertPos,Light light, vec3 view_dir, vec3 norm,vec3 albedo,vec3 F0,float metallic,float roughness){
 
     vec3 light_dir = normalize(light.pos - VertPos);
     vec3 halfway_dir = normalize(light_dir + view_dir);
@@ -148,44 +139,45 @@ vec3 PBR_spot_light(Light light, vec3 view_dir, vec3 norm,vec3 albedo,vec3 F0,fl
 }
 
 
-
-
-
 void main(){
 
-    vec3 albedo=texture(texture_diffuse1,VertTexCoord).rgb;
-    float metallic=texture(texture_metallic1,VertTexCoord).b;
-    float roughness=texture(texture_roughness1,VertTexCoord).g;
-   
-    vec3 norm = TBN * normalize(texture(texture_normal1,VertTexCoord).rgb * 2.0 - 1.0);
+	// requirements
+	vec3 albedo = texture(albedo_texture,VertTexCoord).rgb;
 
-    vec3 F0 = mix(vec3(0.04f), albedo, metallic);
+    vec2 mr=texture(metallic_roughness_texture,VertTexCoord).rg;
+	float metallic=mr.x;
+	float roughness=mr.y;
 
-    vec3 view_dir = normalize(camera_pos-VertPos);
-    //vec3 view_dir = normalize(-camera_dir); // use this if camera is orthogonal
-    vec3 reflect_view = reflect(-view_dir,norm);
+	vec3 norm = texture(normal_texture,VertTexCoord).rgb;;
+	vec3 vertpos = texture(position_texture,VertTexCoord).rgb;;
+
+	// compute each frame
+	vec3 F0 = mix(vec3(0.04f), albedo, metallic);
+
+	vec3 view_dir = normalize(camera_pos-vertpos);
+	//vec3 view_dir = normalize(-camera_dir); // use this if camera is orthogonal
+	vec3 reflect_view = reflect(-view_dir,norm);
 
 
     // direct lighting
     FragColor=vec4(0.0f); 
     for(int i=0;i<LightNR;++i){
         FragColor += vec4(PBR_directed_light(dir_light[i],view_dir,norm,albedo,F0,metallic,roughness),1.0f);
-        FragColor += vec4(PBR_point_light(point_light[i],view_dir,norm,albedo,F0,metallic,roughness),1.0f);
-        FragColor += vec4(PBR_spot_light(spot_light[i],view_dir,norm,albedo,F0,metallic,roughness),1.0f);
+        FragColor += vec4(PBR_point_light(vertpos,point_light[i],view_dir,norm,albedo,F0,metallic,roughness),1.0f);
+        FragColor += vec4(PBR_spot_light(vertpos,spot_light[i],view_dir,norm,albedo,F0,metallic,roughness),1.0f);
     }
+
 
     // IBL
     vec3 diffuse_ibl = KD_star(view_dir,norm,F0,roughness,metallic) * albedo / PI * texture(irradianceMap,norm).rgb;
     vec4 lut_val = texture(brdfLUT,vec2(max(dot(norm, view_dir), 0.0), roughness));
     vec3 specular_ibl = textureLod(prefilterMap, reflect_view, roughness * 4.0f).rgb * (F0 * lut_val.r + lut_val.g);
 
-    FragColor = FragColor + vec4(diffuse_ibl + specular_ibl, 1.0);
-
-
+    FragColor += vec4(diffuse_ibl + specular_ibl, 1.0);
 
     // bloom
     float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
     if(brightness > bloom_threshold)
         BloomColor = vec4(FragColor.rgb, 1.0);
+
 }
- 

@@ -520,7 +520,7 @@
     <ClInclude Include="shader.h" />
     <ClInclude Include="simpleMesh.h" />
     <ClInclude Include="skybox.h" />
-    <ClInclude Include="utility\IBL.h" />
+    <ClInclude Include="utility\IBL.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
@@ -702,6 +702,10 @@
     <None Include="Shaders\BlinnPhong.vert" />
     <None Include="Shaders\DebugShader\depth.frag" />
     <None Include="Shaders\DebugShader\depth.vert" />
+    <None Include="Shaders\DeferredRender\PBR_first_pass.frag" />
+    <None Include="Shaders\DeferredRender\PBR_first_pass.vert" />
+    <None Include="Shaders\DeferredRender\PBR_second_pass.frag" />
+    <None Include="Shaders\DeferredRender\PBR_second_pass.vert" />
     <None Include="Shaders\Effect\reflect.frag" />
     <None Include="Shaders\Effect\reflect.vert" />
     <None Include="Shaders\Effect\outlining.frag" />

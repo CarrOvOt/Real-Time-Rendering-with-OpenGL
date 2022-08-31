@@ -12,6 +12,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/random.hpp >
 
 // our code
 #include "scene.h"
@@ -49,7 +50,7 @@ bool use_wireframe_mode = false;
 glm::vec3 background_color = glm::vec3(0.1f, 0.1f, 0.1f );
 
 glm::vec3 rot_xyz = glm::vec3(-90.0f, 90.0f, 90.0f);
-float scale_xyz = 1.0f;
+float scale_xyz = 0.2f;
 float trans_x = 0.0f;
 
 
@@ -130,7 +131,7 @@ void GUITick() {
         ImGui::Spacing();
 
         if (ImGui::CollapsingHeader("Bloom Setting")) {
-            ImGui::SliderFloat("bloom strength", &bloom_strength, 0.05f, 2.0f);
+            //ImGui::SliderFloat("bloom strength", &bloom_strength, 0.05f, 2.0f);
             ImGui::SliderInt("bloom blur", &bloom_blur, 1, 10);
         }
         ImGui::Spacing();
@@ -237,26 +238,43 @@ int main(){
     GUI::ImGUIInit(window);
 
 
-    ForwardRender* mainRender = new ForwardRender();
-    mainRender->ForwardRenderSet();
+    //ForwardRender* mainRender = new ForwardRender();
+    DeferredRender* mainRender = new DeferredRender();
+    mainRender->RenderSet();
 
 
 
     Scene* mainScene = new Scene();
-    mainScene->Models.push_back(Model("Resource/hk_ump/scene.gltf"));
 
-    mainScene->mainShader = Shader("Shaders/PBR_Texture.vert", "Shaders/PBR_Texture.frag");
-    mainScene->outlineShader = Shader("Shaders/Effect/outlining.vert", "Shaders/Effect/outlining.frag");
+    Model m = Model("Resource/small_flying_droid/scene.gltf");
+    for (int i = 0; i < 5; ++i) {
+        for (int j = 0; j < 5; ++j) {   
+            m.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 5.0f * i, 5.0f * j));
+            mainScene->Models.push_back(m);
+        }
+    }
+    //mainScene->Models.push_back(Model("Resource/small_flying_droid/scene.gltf"));
 
+
+    PointLight pl = PointLight();
+    pl.Power = 10.f;
+    for (int i = 0; i < 32; ++i) {
+        pl.Transform = glm::translate(glm::mat4(1.0f), glm::vec3(glm::linearRand(glm::vec3(-25.0f), glm::vec3(25.0f))));
+        mainScene->PointLights.push_back(pl);
+    }
     mainScene->SpotLights.push_back(SpotLight());
     mainScene->DirLights.push_back(DirLight());
-    mainScene->PointLights.push_back(PointLight());
+    //mainScene->PointLights.push_back(PointLight());
 
     mainScene->mainCamera = Camera(SCR_HEIGHT / 200.0f, SCR_WIDTH / 200.0f);
     mainScene->mainCamera.Move(CAMERAMOVE::BACKWARD, 8.0f);
 
-    mainScene->mainSkybox = Skybox();
+    mainScene->mainSkybox = Skybox("Resource/IBL/Milkyway/Milkyway_small.hdr", true);
     mainScene->setIBL();
+
+    //mainScene->mainShader = Shader("Shaders/PBR_Texture.vert", "Shaders/PBR_Texture.frag");
+    mainScene->mainShader = Shader("Shaders/DeferredRender/PBR_first_pass.vert", "Shaders/DeferredRender/PBR_first_pass.frag");
+    mainScene->outlineShader = Shader("Shaders/Effect/outlining.vert", "Shaders/Effect/outlining.frag");
 
 
 
@@ -279,7 +297,7 @@ int main(){
             model_sp = glm::rotate(glm::mat4(1.0f), glm::radians(rot_xyz.y), glm::vec3(0.0, 1.0, 0.0)) * model_sp;
             model_sp = glm::rotate(glm::mat4(1.0f), glm::radians(rot_xyz.x), glm::vec3(1.0, 0.0, 0.0)) * model_sp;
             model_sp = glm::translate(glm::mat4(1.0f), glm::vec3(trans_x, 0.0f, 0.0f)) * model_sp;
-            mainScene->Models[0].transform = model_sp;
+            //mainScene->Models[0].transform = model_sp;
 
             mainScene->PointLights[0].Transform = glm::translate(glm::mat4(1.0f), light_point_pos);
             mainScene->PointLights[0].Power = light_point_power;
@@ -303,15 +321,14 @@ int main(){
 
             // render settings
             mainRender->draw_outline = draw_outline;
-            mainRender->use_MSAA = use_MSAA;
+            //mainRender->use_MSAA = use_MSAA;
             mainRender->use_Bloom = use_Bloom;
             mainRender->bloom_blur_iter = bloom_blur;
             
-
         }
 
         // Draw scene
-        mainRender->ForwardRenderDraw(mainScene);
+        mainRender->RenderDraw(mainScene);
 
         // Draw GUI
         {

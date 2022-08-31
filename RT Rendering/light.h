@@ -42,8 +42,8 @@ public:
 
 class SpotLight : public Light {
 public:
-	float R1 = 20.0f; // Inner Angle
-	float R2 = 25.0f; // Outer Angle
+	float R1 = 25.0f; // Inner Angle
+	float R2 = 30.0f; // Outer Angle
 
 	SpotLight();
 	void Draw(Camera& camera) override;
