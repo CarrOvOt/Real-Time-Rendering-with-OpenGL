@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
 #include "model.h"
 #include "shader.h"
@@ -11,28 +12,29 @@
 //#include "utility/IBL.h" // will lead re-define, why?
 
 using std::vector;
+using std::shared_ptr;
 
 class Scene {
 
 public:
 
 	// models
-	vector<Model> Models;
+	vector<shared_ptr<Model>> Models;
 
 	// shader
-	Shader mainShader;
-	Shader outlineShader;
+	Shader* mainShader = NULL;
+	Shader* outlineShader = NULL;
 
 	// direct lights
-	vector<SpotLight> SpotLights;
-	vector<DirLight> DirLights;
-	vector<PointLight> PointLights;
+	vector<shared_ptr<SpotLight>> SpotLights;
+	vector<shared_ptr<DirLight>> DirLights;
+	vector<shared_ptr<PointLight>> PointLights;
 
 	// camera for output 
 	Camera mainCamera;
 	
 	// envs
-	Skybox mainSkybox;
+	Skybox* mainSkybox = NULL;
 
 	// envs for PBR
 	unsigned int preFilteredCubemap;
@@ -44,15 +46,13 @@ public:
 	glm::vec3 outline_color = glm::vec3(0.1f, 0.4f, 0.2f);
 
 
-
-
 	// set IBL textures for PBR
 	void setIBL();
 
 	// set uniform vars in shader
-	void setShaderLight(Shader& shader);
-	void setShaderCamera(Shader& shader);
-	void setShaderEnv(Shader& shader);
+	void setShaderLight(Shader* shader);
+	void setShaderCamera(Shader* shader);
+	void setShaderEnv(Shader* shader);
 	void setShaderOutline();
 
 	// draw model, lights sign, skybox, outlines
@@ -61,4 +61,6 @@ public:
 	void DrawSkybox();
 	void DrawOutline();
 
+
+	~Scene();
 };

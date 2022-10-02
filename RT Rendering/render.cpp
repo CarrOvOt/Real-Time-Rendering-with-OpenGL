@@ -89,10 +89,10 @@ void ForwardRender::RenderSet(){
             std::cout << "Framebuffer not complete!" << std::endl;
     }
 
-    this->screenMesh = SimpleMesh(SHAPE::RECT);
-    this->screenMesh.RemoveTextures();
-    this->screenShader = Shader("Shaders/Postprocess/default.vert", "Shaders/Postprocess/default.frag");
-    this->shaderBlur = Shader("Shaders/Postprocess/gaussianBlur.vert", "Shaders/Postprocess/gaussianBlur.frag");
+    this->screenMesh = make_shared<SimpleMesh>(SHAPE::RECT);
+    this->screenMesh->RemoveTextures();
+    this->screenShader = new Shader("Shaders/Postprocess/default.vert", "Shaders/Postprocess/default.frag");
+    this->shaderBlur = new Shader("Shaders/Postprocess/gaussianBlur.vert", "Shaders/Postprocess/gaussianBlur.frag");
 
 
 }
@@ -180,7 +180,7 @@ void ForwardRender::RenderDraw(Scene* scene){
     if (this->use_Bloom) {
         GLboolean first_iteration = true;
         GLuint iter = this->bloom_blur_iter;
-        shaderBlur.use();
+        shaderBlur->use();
 
         for (GLuint i = 0; i < iter; i++) {
 
@@ -189,16 +189,16 @@ void ForwardRender::RenderDraw(Scene* scene){
 
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, first_iteration ? screenBloomTexture : pingpongBuffer[0]);
-            shaderBlur.setBool("horizontal", true);
-            screenMesh.Draw(shaderBlur);
+            shaderBlur->setBool("horizontal", true);
+            screenMesh->Draw(shaderBlur);
 
             glBindFramebuffer(GL_READ_FRAMEBUFFER, pingpongFBO[1]);
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, pingpongFBO[0]);
 
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, pingpongBuffer[1]);
-            shaderBlur.setBool("horizontal", false);
-            screenMesh.Draw(shaderBlur);
+            shaderBlur->setBool("horizontal", false);
+            screenMesh->Draw(shaderBlur);
 
 
             if (first_iteration)
@@ -219,18 +219,23 @@ void ForwardRender::RenderDraw(Scene* scene){
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-        screenShader.use();
-        screenShader.setBool("useBloom", this->use_Bloom);
+        screenShader->use();
+        screenShader->setBool("useBloom", this->use_Bloom);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, screenTexture);
-        screenShader.setInt("screenTexture", 0);
+        screenShader->setInt("screenTexture", 0);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, pingpongBuffer[0]);
-        screenShader.setInt("screenBloomTexture", 1);
-        screenMesh.Draw(screenShader);
+        screenShader->setInt("screenBloomTexture", 1);
+        screenMesh->Draw(screenShader);
     }
 
 
+}
+
+ForwardRender::~ForwardRender(){
+    delete screenShader;
+    delete shaderBlur;
 }
 
 
@@ -342,11 +347,11 @@ void DeferredRender::RenderSet(){
     }
 
 
-    this->screenMesh = SimpleMesh(SHAPE::RECT);
-    this->screenMesh.RemoveTextures();
-    this->second_pass_shader = Shader("Shaders/DeferredRender/PBR_second_pass.vert", "Shaders/DeferredRender/PBR_second_pass.frag");
-    this->screenShader = Shader("Shaders/Postprocess/default.vert", "Shaders/Postprocess/default.frag");
-    this->shaderBlur = Shader("Shaders/Postprocess/gaussianBlur.vert", "Shaders/Postprocess/gaussianBlur.frag");
+    this->screenMesh = make_shared<SimpleMesh>(SHAPE::RECT);
+    this->screenMesh->RemoveTextures();
+    this->second_pass_shader = new Shader("Shaders/DeferredRender/PBR_second_pass.vert", "Shaders/DeferredRender/PBR_second_pass.frag");
+    this->screenShader = new Shader("Shaders/Postprocess/default.vert", "Shaders/Postprocess/default.frag");
+    this->shaderBlur = new Shader("Shaders/Postprocess/gaussianBlur.vert", "Shaders/Postprocess/gaussianBlur.frag");
 
 }
 
@@ -401,21 +406,21 @@ void DeferredRender::RenderDraw(Scene* scene){
         scene->setShaderEnv(this->second_pass_shader);
 
 
-        second_pass_shader.use();
+        second_pass_shader->use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, g_albedo);
-        second_pass_shader.setInt("albedo_texture", 0);
+        second_pass_shader->setInt("albedo_texture", 0);
         glActiveTexture(GL_TEXTURE0+1);
         glBindTexture(GL_TEXTURE_2D, g_normal);
-        second_pass_shader.setInt("normal_texture", 1);
+        second_pass_shader->setInt("normal_texture", 1);
         glActiveTexture(GL_TEXTURE0+2);
         glBindTexture(GL_TEXTURE_2D, g_position);
-        second_pass_shader.setInt("position_texture", 2);
+        second_pass_shader->setInt("position_texture", 2);
         glActiveTexture(GL_TEXTURE0+3);
         glBindTexture(GL_TEXTURE_2D, g_material);
-        second_pass_shader.setInt("metallic_roughness_texture", 3);
+        second_pass_shader->setInt("metallic_roughness_texture", 3);
 
-        screenMesh.Draw(second_pass_shader);
+        screenMesh->Draw(second_pass_shader);
 
     }
 
@@ -423,7 +428,7 @@ void DeferredRender::RenderDraw(Scene* scene){
     if (this->use_Bloom) {
         GLboolean first_iteration = true;
         GLuint iter = this->bloom_blur_iter;
-        shaderBlur.use();
+        shaderBlur->use();
 
         for (GLuint i = 0; i < iter; i++) {
 
@@ -432,16 +437,16 @@ void DeferredRender::RenderDraw(Scene* scene){
 
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, first_iteration ? screenBloomTexture : pingpongBuffer[0]);
-            shaderBlur.setBool("horizontal", true);
-            screenMesh.Draw(shaderBlur);
+            shaderBlur->setBool("horizontal", true);
+            screenMesh->Draw(shaderBlur);
 
             glBindFramebuffer(GL_READ_FRAMEBUFFER, pingpongFBO[1]);
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, pingpongFBO[0]);
 
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, pingpongBuffer[1]);
-            shaderBlur.setBool("horizontal", false);
-            screenMesh.Draw(shaderBlur);
+            shaderBlur->setBool("horizontal", false);
+            screenMesh->Draw(shaderBlur);
 
             if (first_iteration)
                 first_iteration = false;
@@ -460,15 +465,15 @@ void DeferredRender::RenderDraw(Scene* scene){
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-            screenShader.use();
-            screenShader.setBool("useBloom", this->use_Bloom);
+            screenShader->use();
+            screenShader->setBool("useBloom", this->use_Bloom);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, screenTexture);
-            screenShader.setInt("screenTexture", 0);
+            screenShader->setInt("screenTexture", 0);
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, pingpongBuffer[0]);
-            screenShader.setInt("screenBloomTexture", 1);
-            screenMesh.Draw(screenShader);
+            screenShader->setInt("screenBloomTexture", 1);
+            screenMesh->Draw(screenShader);
         }
 
         // copy depth and stencil buffer from first pass
@@ -507,4 +512,10 @@ void DeferredRender::RenderDraw(Scene* scene){
     }
 
 
+}
+
+DeferredRender::~DeferredRender(){
+    delete second_pass_shader;
+    delete screenShader;
+    delete shaderBlur;
 }

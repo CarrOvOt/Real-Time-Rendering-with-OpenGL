@@ -74,6 +74,10 @@
     <LibraryPath>C:\Users\96904\Desktop\Real-Time-Rendering-with-OpenGL\RT Rendering\External\GLFW\lib;C:\Users\96904\Desktop\Real-Time-Rendering-with-OpenGL\RT Rendering\External\Assimp\lib;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\Users\96904\Desktop\Real-Time-Rendering-with-OpenGL\RT Rendering\External\GLFW\include;C:\Users\96904\Desktop\Real-Time-Rendering-with-OpenGL\RT Rendering\External\GLAD\include;C:\Users\96904\Desktop\Real-Time-Rendering-with-OpenGL\RT Rendering\External\Assimp\include;C:\Users\96904\Desktop\Real-Time-Rendering-with-OpenGL\RT Rendering\External\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>C:\Users\96904\Desktop\Real-Time-Rendering-with-OpenGL\RT Rendering\External\GLFW\include;C:\Users\96904\Desktop\Real-Time-Rendering-with-OpenGL\RT Rendering\External\GLAD\include;C:\Users\96904\Desktop\Real-Time-Rendering-with-OpenGL\RT Rendering\External\Assimp\include;C:\Users\96904\Desktop\Real-Time-Rendering-with-OpenGL\RT Rendering\External\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\96904\Desktop\Real-Time-Rendering-with-OpenGL\RT Rendering\External\GLFW\lib;C:\Users\96904\Desktop\Real-Time-Rendering-with-OpenGL\RT Rendering\External\Assimp\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -129,6 +133,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3.lib;opengl32.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

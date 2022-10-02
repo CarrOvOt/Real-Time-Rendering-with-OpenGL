@@ -8,19 +8,23 @@ Model::Model(string file){
 }
 
 Model::Model(SHAPE shape){
-	meshes.emplace_back(SimpleMesh(shape));
+	meshes.push_back(make_shared<SimpleMesh>(shape));
+}
+
+Model::~Model(){
+
 }
 
 
-void Model::Draw(Shader& shader, Camera& camera){
-	for (Mesh mesh : meshes) {
-		mesh.Draw(shader, camera, transform);
+void Model::Draw(Shader* shader, Camera& camera){
+	for (auto mesh : meshes) {
+		mesh->Draw(shader, camera, transform);
 	}
 }
 
-void Model::Draw(Shader& shader){
-    for (Mesh mesh : meshes) {
-        mesh.Draw(shader, transform);
+void Model::Draw(Shader* shader){
+    for (auto mesh : meshes) {
+        mesh->Draw(shader, transform);
     }
 }
 
@@ -58,7 +62,7 @@ void Model::processNode(aiNode* node, const aiScene* scene){
 
 }
 
-Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene){
+shared_ptr<Mesh> Model::processMesh(aiMesh* mesh, const aiScene* scene){
 
     // data to fill
     vector<Vertex> vertices;
@@ -113,10 +117,10 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene){
     // normal: texture_normalN
 
     // 1. diffuse maps
-    vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, TEXTURE_TYPE::DIFFUSE);
+    std::vector<Texture> diffuseMaps = loadMaterialTextures(material, aiTextureType_DIFFUSE, TEXTURE_TYPE::DIFFUSE);
     textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
     // 2. specular maps
-    vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, TEXTURE_TYPE::SPECULAR);
+    std::vector<Texture> specularMaps = loadMaterialTextures(material, aiTextureType_SPECULAR, TEXTURE_TYPE::SPECULAR);
     textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
     // 3. normal maps
     std::vector<Texture> normalMaps = loadMaterialTextures(material, aiTextureType_NORMALS, TEXTURE_TYPE::NORMAL);
@@ -136,7 +140,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene){
     textures.insert(textures.end(), roughnessMaps.begin(), roughnessMaps.end());
 
     // return a mesh object created from the extracted mesh data
-    return Mesh(vertices, indices, textures);
+    return make_shared<Mesh>(vertices, indices, textures);
 
 }
 
@@ -160,11 +164,11 @@ vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType type,
         if (!skip){
            // if texture hasn't been loaded already, load it
             Texture texture;
-            texture.id = TextureFromFile(str.C_Str(), this->directory);
+            texture.id = TextureFromFile(str.C_Str(), this->directory, typeName==TEXTURE_TYPE::DIFFUSE);
             texture.type = typeName;
             texture.name = str.C_Str();
-            textures.push_back(texture);
-            texturesLoaded.push_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
+            textures.emplace_back(texture);
+            texturesLoaded.emplace_back(texture);  // store it as texture loaded for entire model, to ensure we won't unnecesery load duplicate textures.
         }
     }
     return textures;
@@ -184,6 +188,7 @@ unsigned int Model::TextureFromFile(const char* path, const string& directory, b
     if (data){
 
         GLenum format = -1;
+        GLenum interformat = -1;
         if (nrComponents == 1)
             format = GL_RED;
         else if (nrComponents == 3)
@@ -193,18 +198,18 @@ unsigned int Model::TextureFromFile(const char* path, const string& directory, b
 
         if (gamma) {
             if (nrComponents == 1)
-                format = GL_RED;
+                interformat = GL_RED;
             else if (nrComponents == 3)
-                format = GL_SRGB;
+                interformat = GL_SRGB;
             else if (nrComponents == 4)
-                format = GL_SRGB_ALPHA;
+                interformat = GL_SRGB_ALPHA;
         }
         if (format == -1) {
             std::cout << "load fail, check texture channel at path: " << path << std::endl;
         }
 
         glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, gamma?interformat:format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

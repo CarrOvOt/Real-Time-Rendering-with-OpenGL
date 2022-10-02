@@ -48,6 +48,8 @@ public:
 	Camera();
 	Camera(float height,float width);
 
+	~Camera();
+
 
 	glm::mat4 GetViewMatrix();
 	glm::mat4 GetProjMatrix();

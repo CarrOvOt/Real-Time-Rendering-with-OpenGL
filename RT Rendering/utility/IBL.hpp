@@ -10,7 +10,7 @@
 
 
 
-    static const float CubeVertices[] = {
+static const float CubeVertices[] = {
         // positions          
         -1.0f,  1.0f, -1.0f,
         -1.0f, -1.0f, -1.0f,
@@ -55,7 +55,7 @@
          1.0f, -1.0f,  1.0f
     };
 
-    static const float QuadVertices[] = {
+static const float QuadVertices[] = {
         // positions          
         -1.0f,  1.0f, 0.0f,
         -1.0f, -1.0f, 0.0f,
@@ -65,8 +65,8 @@
         -1.0f,  1.0f, 0.0f,
     };
 
-    static const glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
-    static const glm::mat4 captureViews[] = {
+static const glm::mat4 captureProjection = glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f);
+static const glm::mat4 captureViews[] = {
            glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
            glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)),
            glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)),
@@ -106,7 +106,7 @@ public:
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, MAPSIZE, MAPSIZE);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
 
-        Shader shader = Shader("Utility/UtilityShaders/LatLongToCube.vert", "Utility/UtilityShaders/LatLongToCube.frag");
+        Shader shader("Utility/UtilityShaders/LatLongToCube.vert", "Utility/UtilityShaders/LatLongToCube.frag");
 
         // convert HDR equirectangular environment map to cubemap equivalent
         shader.use();
@@ -222,7 +222,7 @@ public:
         // generate mipmaps for the cubemap so OpenGL automatically allocates the required memory.
         glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
-        Shader shader = Shader("Utility/UtilityShaders/prefilter.vert", "Utility/UtilityShaders/prefilter.frag");
+        Shader shader("Utility/UtilityShaders/prefilter.vert", "Utility/UtilityShaders/prefilter.frag");
 
         shader.use();
         shader.setInt("envMap", 0);
@@ -329,7 +329,7 @@ public:
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTTexture, 0);
 
 
-        Shader shader = Shader("Utility/UtilityShaders/brdf_lut.vert", "Utility/UtilityShaders/brdf_lut.frag");
+        Shader shader("Utility/UtilityShaders/brdf_lut.vert", "Utility/UtilityShaders/brdf_lut.frag");
 
         glViewport(0, 0, TABLESIZE, TABLESIZE);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -382,7 +382,7 @@ public:
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
 
 
-        Shader shader = Shader("Utility/UtilityShaders/irradiance.vert", "Utility/UtilityShaders/irradiance.frag");
+        Shader shader("Utility/UtilityShaders/irradiance.vert", "Utility/UtilityShaders/irradiance.frag");
 
         shader.use();
         shader.setInt("envMap", 0);

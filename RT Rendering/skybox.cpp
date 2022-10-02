@@ -71,7 +71,7 @@ Skybox::Skybox(){
 	}
 	
     this->texture = loadCubemap("Resource/Skybox/");
-    this->shader = Shader("Shaders/BasicShader/skyboxDraw.vert", "Shaders/BasicShader/skyboxDraw.frag");
+    this->shader = new Shader("Shaders/BasicShader/skyboxDraw.vert", "Shaders/BasicShader/skyboxDraw.frag");
 
 }
 
@@ -82,12 +82,16 @@ Skybox::Skybox(std::string path, bool hdr) : Skybox{} {
    
 }
 
+Skybox::~Skybox(){
+    delete shader;
+}
+
 void Skybox::Draw(Camera& camera){
 
-    shader.use();
+    shader->use();
 
-    shader.setMat4("view_sp", glm::mat4(glm::mat3(camera.GetViewMatrix())));
-    shader.setMat4("proj_sp", camera.GetProjMatrix());
+    shader->setMat4("view_sp", glm::mat4(glm::mat3(camera.GetViewMatrix())));
+    shader->setMat4("proj_sp", camera.GetProjMatrix());
 
     glBindVertexArray(VAO);
     glActiveTexture(GL_TEXTURE0);

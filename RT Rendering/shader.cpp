@@ -64,6 +64,13 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath){
 
 }
 
+Shader::~Shader(){
+
+    if (ID != -1) {
+        glDeleteProgram(ID);
+    }
+}
+
 void Shader::use(){
     if(ID==-1) std::cout << "ERROR::SHADER::NO DEFAULT SHADER" << std::endl;
 	glUseProgram(ID);

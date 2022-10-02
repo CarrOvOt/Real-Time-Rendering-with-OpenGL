@@ -22,7 +22,9 @@
 
 // others
 #include <iostream>
+#include <memory>
 #include <string>
+
 
 
 // settings
@@ -90,7 +92,11 @@ void GUITick() {
         static float f = 0.0f;
         static int counter = 0;
 
+
+
         ImGui::Begin("Setting");
+        ImGui::Text("Press \"1\" to switch camera mode and setting mode");
+        ImGui::Text("Press W A S D Q E to move camera");
 
         if (ImGui::CollapsingHeader("Global Setting")) {
 
@@ -234,47 +240,57 @@ int main(){
     printf("OpenGL version : %s\n", version);
 
 
+
+
     // ImGUI
     GUI::ImGUIInit(window);
 
 
-    //ForwardRender* mainRender = new ForwardRender();
-    DeferredRender* mainRender = new DeferredRender();
+    // Render
+    //  
+    ForwardRender* mainRender = new ForwardRender();
+    //DeferredRender* mainRender = new DeferredRender();
     mainRender->RenderSet();
 
 
-
+    // Scene
     Scene* mainScene = new Scene();
 
-    Model m = Model("Resource/small_flying_droid/scene.gltf");
-    for (int i = 0; i < 5; ++i) {
-        for (int j = 0; j < 5; ++j) {   
-            m.transform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 5.0f * i, 5.0f * j));
-            mainScene->Models.push_back(m);
-        }
-    }
-    //mainScene->Models.push_back(Model("Resource/small_flying_droid/scene.gltf"));
+    //for (int i = 0; i < 5; ++i) {
+    //    for (int j = 0; j < 5; ++j) {   
+    //        glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 5.0f * i, 5.0f * j));
+    //        mainScene->Models.push_back(make_shared<Model>("Resource/small_flying_droid/scene.gltf"));
+    //        mainScene->Models[i*5+j]->transform = trans;
+    //    }
+    //}
+
+    mainScene->Models.push_back(make_shared<Model>("Resource/small_flying_droid/scene.gltf"));
+
+    mainScene->PointLights.reserve(32);
+    mainScene->SpotLights.reserve(32);
+    mainScene->DirLights.reserve(32);
 
 
-    PointLight pl = PointLight();
-    pl.Power = 10.f;
+    std::shared_ptr<Shader> lightShader = std::make_shared<Shader>("Shaders/BasicShader/lightDraw.vert", "Shaders/BasicShader/lightDraw.frag");
     for (int i = 0; i < 32; ++i) {
-        pl.Transform = glm::translate(glm::mat4(1.0f), glm::vec3(glm::linearRand(glm::vec3(-25.0f), glm::vec3(25.0f))));
-        mainScene->PointLights.push_back(pl);
+        glm::mat4 trans = glm::translate(glm::mat4(1.0f), glm::vec3(glm::linearRand(glm::vec3(-25.0f), glm::vec3(25.0f))));
+        mainScene->PointLights.push_back(make_shared<PointLight>(lightShader));
+        mainScene->PointLights[i]->Transform = trans;
+        mainScene->PointLights[i]->Power = 10.0f;
     }
-    mainScene->SpotLights.push_back(SpotLight());
-    mainScene->DirLights.push_back(DirLight());
-    //mainScene->PointLights.push_back(PointLight());
+    mainScene->SpotLights.push_back(make_shared<SpotLight>(lightShader));
+    mainScene->DirLights.push_back(make_shared<DirLight>(lightShader));
+
 
     mainScene->mainCamera = Camera(SCR_HEIGHT / 200.0f, SCR_WIDTH / 200.0f);
     mainScene->mainCamera.Move(CAMERAMOVE::BACKWARD, 8.0f);
 
-    mainScene->mainSkybox = Skybox("Resource/IBL/Milkyway/Milkyway_small.hdr", true);
+    mainScene->mainSkybox = new Skybox("Resource/IBL/Milkyway/Milkyway_small.hdr", true);
     mainScene->setIBL();
 
-    //mainScene->mainShader = Shader("Shaders/PBR_Texture.vert", "Shaders/PBR_Texture.frag");
-    mainScene->mainShader = Shader("Shaders/DeferredRender/PBR_first_pass.vert", "Shaders/DeferredRender/PBR_first_pass.frag");
-    mainScene->outlineShader = Shader("Shaders/Effect/outlining.vert", "Shaders/Effect/outlining.frag");
+    mainScene->mainShader = new Shader("Shaders/PBR_Texture.vert", "Shaders/PBR_Texture.frag");
+    //mainScene->mainShader = new Shader("Shaders/DeferredRender/PBR_first_pass.vert", "Shaders/DeferredRender/PBR_first_pass.frag");
+    mainScene->outlineShader =new Shader("Shaders/Effect/outlining.vert", "Shaders/Effect/outlining.frag");
 
 
 
@@ -299,22 +315,22 @@ int main(){
             model_sp = glm::translate(glm::mat4(1.0f), glm::vec3(trans_x, 0.0f, 0.0f)) * model_sp;
             //mainScene->Models[0].transform = model_sp;
 
-            mainScene->PointLights[0].Transform = glm::translate(glm::mat4(1.0f), light_point_pos);
-            mainScene->PointLights[0].Power = light_point_power;
+            mainScene->PointLights[0]->Transform = glm::translate(glm::mat4(1.0f), light_point_pos);
+            mainScene->PointLights[0]->Power = light_point_power;
 
             glm::mat4 light_dir_trans = glm::rotate(glm::mat4(1.0f), glm::radians(light_dir_rot[0]), glm::vec3(1.0, 0.0, 0.0));
             light_dir_trans = glm::rotate(glm::mat4(1.0f), glm::radians(light_dir_rot[1]), glm::vec3(0.0, 0.0, 1.0)) * light_dir_trans;
             light_dir_trans = glm::rotate(glm::mat4(1.0f), glm::radians(light_dir_rot[2]), glm::vec3(0.0, 1.0, 0.0)) * light_dir_trans;
-            light_dir_trans[3] = mainScene->DirLights[0].Transform[3];
-            mainScene->DirLights[0].Transform = light_dir_trans;
-            mainScene->DirLights[0].Power = light_dir_power;
+            light_dir_trans[3] = mainScene->DirLights[0]->Transform[3];
+            mainScene->DirLights[0]->Transform = light_dir_trans;
+            mainScene->DirLights[0]->Power = light_dir_power;
 
             glm::mat4 light_spot_trans = glm::rotate(glm::mat4(1.0f), glm::radians(light_spot_rot[0]), glm::vec3(1.0, 0.0, 0.0));
             light_spot_trans = glm::rotate(glm::mat4(1.0f), glm::radians(light_spot_rot[1]), glm::vec3(0.0, 0.0, 1.0)) * light_spot_trans;
             light_spot_trans = glm::rotate(glm::mat4(1.0f), glm::radians(light_spot_rot[2]), glm::vec3(0.0, 1.0, 0.0)) * light_spot_trans;
             light_spot_trans = glm::translate(glm::mat4(1.0f), light_spot_pos) * light_spot_trans;
-            mainScene->SpotLights[0].Transform = light_spot_trans;
-            mainScene->SpotLights[0].Power = light_spot_power;
+            mainScene->SpotLights[0]->Transform = light_spot_trans;
+            mainScene->SpotLights[0]->Power = light_spot_power;
 
             // camera
             mainScene->mainCamera = mainCamera;
@@ -344,6 +360,11 @@ int main(){
 
     // release resource and quit
     glfwTerminate();
+
+    delete mainScene;
+
+
+
     return 0;
 }
 

@@ -1,6 +1,6 @@
 #include "mesh.h"
 
-Mesh::Mesh(){
+Mesh::Mesh():VAO(0),VBO(0),EBO(0) {
 }
 
 Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures){
@@ -10,15 +10,23 @@ Mesh::Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture
     setupMesh();
 }
 
+Mesh::~Mesh(){
+
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+
+}
 
 
-void Mesh::Draw(Shader& shader, Camera& camera, glm::mat4 parent_trans){
 
-    shader.use();
+void Mesh::Draw(Shader* shader, Camera& camera, glm::mat4 parent_trans){
 
-    shader.setMat4("model_sp", parent_trans*Transform);
-    shader.setMat4("view_sp", camera.GetViewMatrix());
-    shader.setMat4("proj_sp", camera.GetProjMatrix());
+    shader->use();
+
+    shader->setMat4("model_sp", parent_trans*Transform);
+    shader->setMat4("view_sp", camera.GetViewMatrix());
+    shader->setMat4("proj_sp", camera.GetProjMatrix());
 
 	// bind textures
 	unsigned int diffuseNr = 1, specularNr = 1, normalNr = 1, metallicNr = 1, roughNr = 1;
@@ -41,7 +49,7 @@ void Mesh::Draw(Shader& shader, Camera& camera, glm::mat4 parent_trans){
         if (Textures[i].type == ROUGHNESS) {
             name = "texture_roughness" + std::to_string(roughNr++);
         }
-		shader.setInt(name.c_str(), i);
+		shader->setInt(name.c_str(), i);
 		glBindTexture(GL_TEXTURE_2D, Textures[i].id);
 	}
 
@@ -54,11 +62,11 @@ void Mesh::Draw(Shader& shader, Camera& camera, glm::mat4 parent_trans){
 
 }
 
-void Mesh::Draw(Shader& shader, glm::mat4 parent_trans){
+void Mesh::Draw(Shader* shader, glm::mat4 parent_trans){
 
-    shader.use();
+    shader->use();
 
-    shader.setMat4("model_sp", parent_trans * Transform);
+    shader->setMat4("model_sp", parent_trans * Transform);
 
     // bind textures
     unsigned int diffuseNr = 1, specularNr = 1, normalNr = 1, metallicNr = 1, roughNr = 1;
@@ -81,7 +89,7 @@ void Mesh::Draw(Shader& shader, glm::mat4 parent_trans){
         if (Textures[i].type == ROUGHNESS) {
             name = "texture_roughness" + std::to_string(roughNr++);
         }
-        shader.setInt(name.c_str(), i);
+        shader->setInt(name.c_str(), i);
         glBindTexture(GL_TEXTURE_2D, Textures[i].id);
     }
 
@@ -93,8 +101,8 @@ void Mesh::Draw(Shader& shader, glm::mat4 parent_trans){
 
 }
 
-void Mesh::Draw(Shader& shader){
-    shader.use();
+void Mesh::Draw(Shader* shader){
+    shader->use();
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, static_cast<unsigned int>(Indices.size()), GL_UNSIGNED_INT, 0);

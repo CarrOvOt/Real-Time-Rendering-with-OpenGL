@@ -87,25 +87,6 @@ static unsigned int RectIndic[] = {
 
 SimpleMesh::SimpleMesh(){
     
-    for (int i = 0; i < 36; ++i) {
-        Vertex v;
-        v.Position = glm::vec3(CubeVert[i * 8], CubeVert[i * 8 + 1], CubeVert[i * 8 + 2]);
-        v.Normal = glm::vec3(CubeVert[i * 8+3], CubeVert[i * 8 + 4], CubeVert[i * 8 + 5]);
-        v.TexCoord = glm::vec2(CubeVert[i * 8 + 6], CubeVert[i * 8 + 7]);
-        Vertices.emplace_back(v);
-    }
-    for (int i = 0; i < 36; ++i) {
-        Indices.emplace_back(CubeIndic[i]);
-    }
-
-    Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_COL_1K.jpg", TEXTURE_TYPE::DIFFUSE));
-    Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_REFL_1K.jpg", TEXTURE_TYPE::SPECULAR));
-    Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_NRM_1K.jpg", TEXTURE_TYPE::NORMAL));
-
-    setupTangent();
-
-    
-    setupMesh();
 }
 
 SimpleMesh::SimpleMesh(SHAPE shape){
@@ -122,9 +103,9 @@ SimpleMesh::SimpleMesh(SHAPE shape){
             Indices.emplace_back(RectIndic[i]);
         }
 
-        Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_COL_1K.jpg", TEXTURE_TYPE::DIFFUSE));
-        Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_REFL_1K.jpg", TEXTURE_TYPE::SPECULAR));
-        Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_NRM_1K.jpg", TEXTURE_TYPE::NORMAL));
+        //Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_COL_1K.jpg", TEXTURE_TYPE::DIFFUSE));
+        //Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_REFL_1K.jpg", TEXTURE_TYPE::SPECULAR));
+        //Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_NRM_1K.jpg", TEXTURE_TYPE::NORMAL));
 
         setupTangent();
 
@@ -142,9 +123,9 @@ SimpleMesh::SimpleMesh(SHAPE shape){
             Indices.emplace_back(CubeIndic[i]);
         }
 
-        Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_COL_1K.jpg", TEXTURE_TYPE::DIFFUSE));
-        Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_REFL_1K.jpg", TEXTURE_TYPE::SPECULAR));
-        Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_NRM_1K.jpg", TEXTURE_TYPE::NORMAL));
+        //Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_COL_1K.jpg", TEXTURE_TYPE::DIFFUSE));
+        //Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_REFL_1K.jpg", TEXTURE_TYPE::SPECULAR));
+        //Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_NRM_1K.jpg", TEXTURE_TYPE::NORMAL));
 
         setupTangent();
     }
@@ -189,9 +170,9 @@ SimpleMesh::SimpleMesh(SHAPE shape){
             }
         }
         
-        Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_COL_1K.jpg", TEXTURE_TYPE::DIFFUSE));
-        Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_REFL_1K.jpg", TEXTURE_TYPE::SPECULAR));
-        Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_NRM_1K.jpg", TEXTURE_TYPE::NORMAL));
+        //Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_COL_1K.jpg", TEXTURE_TYPE::DIFFUSE));
+        //Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_REFL_1K.jpg", TEXTURE_TYPE::SPECULAR));
+        //Textures.emplace_back(loadTexture("./Resource/WoodFlooring/WoodFlooringMahoganyAfricanSanded001_NRM_1K.jpg", TEXTURE_TYPE::NORMAL));
 
         setupTangent();
     }

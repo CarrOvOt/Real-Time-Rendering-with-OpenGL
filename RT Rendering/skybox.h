@@ -17,6 +17,8 @@ public:
 	Skybox();
     Skybox(std::string path, bool hdr);
 
+	~Skybox();
+
 	void Draw(Camera& camera);
 
     void ReloadCubemap(std::string path);
@@ -27,7 +29,7 @@ public:
 
 private:
 
-	Shader shader;
+	Shader* shader = NULL;
 
 	unsigned int VAO, VBO, texture;
 

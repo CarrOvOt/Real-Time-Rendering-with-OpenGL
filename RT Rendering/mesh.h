@@ -50,10 +50,14 @@ public:
 	Mesh();
 	Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures);
 
+	Mesh(const Mesh&) = delete;
 
-	void Draw(Shader& shader, Camera& camera, glm::mat4 parent_trans);
-	void Draw(Shader& shader, glm::mat4 parent_trans);
-	void Draw(Shader& shader); // draw without setting any uniform vars, for screen texture drawing.
+	~Mesh();
+
+
+	void Draw(Shader* shader, Camera& camera, glm::mat4 parent_trans);
+	void Draw(Shader* shader, glm::mat4 parent_trans);
+	void Draw(Shader* shader); // draw without setting any uniform vars, for screen texture drawing.
 
 
 protected:

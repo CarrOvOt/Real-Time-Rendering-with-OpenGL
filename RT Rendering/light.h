@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <glm/glm.hpp>
 
 #include "shader.h"
@@ -17,16 +19,23 @@ public:
 
 	void virtual Draw(Camera& camera)=0;
 
+
+	Light() = default;
+	Light(const Light&) = delete;
+
+	~Light();
+
 protected:
 
 	unsigned int DrawVAO, DrawVBO;
-	Shader DrawShader;
+	std::shared_ptr<Shader> DrawShader;
 
 };
 
 class PointLight : public Light {
 public:
 	PointLight();
+	PointLight(std::shared_ptr<Shader> DrawShader);
 	void Draw(Camera& camera) override;
 
 private:
@@ -36,6 +45,7 @@ private:
 class DirLight : public Light {
 public:
 	DirLight();
+	DirLight(std::shared_ptr<Shader> DrawShader);
 	void Draw(Camera& camera) override;
 	glm::vec3 GetDirection();// (0,-1,0) is the defaut direction without any transform
 };
@@ -46,6 +56,7 @@ public:
 	float R2 = 30.0f; // Outer Angle
 
 	SpotLight();
+	SpotLight(std::shared_ptr<Shader> DrawShader);
 	void Draw(Camera& camera) override;
 	glm::vec3 GetDirection();// (0,-1,0) is the defaut direction without any transform
 };

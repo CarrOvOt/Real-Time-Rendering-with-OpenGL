@@ -34,17 +34,20 @@ public:
 	GLuint pingpongBuffer[2];
 
 	// screen mesh
-	SimpleMesh screenMesh;
+	shared_ptr<SimpleMesh> screenMesh;
 
 	// screen shader
-	Shader screenShader;
+	Shader* screenShader = NULL;
 
 	// gaussian blur for bloom
-	Shader shaderBlur;
+	Shader* shaderBlur = NULL;
 
 
 	void RenderSet();
 	void RenderDraw(Scene* scene);
+
+
+	~ForwardRender();
 
 };
 
@@ -62,7 +65,7 @@ public:
 	unsigned int bloom_blur_iter = 5;
 
 	// screen mesh
-	SimpleMesh screenMesh;
+	shared_ptr<SimpleMesh> screenMesh;
 
 	// G-buffer
 	unsigned int gBuffer;
@@ -82,14 +85,16 @@ public:
 
 
 	// screen shader
-	Shader second_pass_shader;
-	Shader screenShader;
+	Shader* second_pass_shader = NULL;
+	Shader* screenShader = NULL;
 
 	// gaussian blur for bloom
-	Shader shaderBlur;
+	Shader* shaderBlur = NULL;
 
 
 	void RenderSet();
 	void RenderDraw(Scene* scene);
+
+	~DeferredRender();
 
 };

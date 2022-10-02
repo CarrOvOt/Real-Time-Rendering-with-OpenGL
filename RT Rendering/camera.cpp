@@ -10,6 +10,9 @@ Camera::Camera(float height, float width):Height(height),Width(width) {
 	UpdateVector();
 }
 
+Camera::~Camera() {
+}
+
 glm::mat4 Camera::GetViewMatrix(){
 	return glm::lookAt(Position, Position + Front, Up);
 }
